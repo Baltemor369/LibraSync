@@ -20,7 +20,7 @@ class Manga:
     def change_name(self, new_name:str) -> None:
         self.name = new_name
 
-class Manatheque:
+class MangaLib:
     def __init__(self) -> None:
         self.biblio = [Manga()]
         self.biblio.pop()
