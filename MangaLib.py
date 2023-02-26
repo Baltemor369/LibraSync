@@ -1,12 +1,19 @@
+import datetime
+
 class Manga:
     def __init__(self, name="",  creator="", type="", tome_nb=0) -> None:
         self.name = name
         self.autor = creator
         self.type = type
         self.tome_numero = tome_nb
+        self.data={}
 
     def __repr__(self) -> str:
-        return f"Name : {self.name} \nAutor : {self.autor} \nType : {self.type} \nNumber of tome : {self.tome_numero} \n\n"
+        buff = f"Name : {self.name} \nAutor : {self.autor} \nType : {self.type} \nNumber of tome : {self.tome_numero} \n"
+        for key in self.data:
+            buff += str(key)+" : "+self.data[key]+"\n"
+        buff += "\n"
+        return buff
 
     def change_tome_numero(self, new_value:int) -> None:
         self.tome_numero = new_value
@@ -19,6 +26,9 @@ class Manga:
 
     def change_name(self, new_name:str) -> None:
         self.name = new_name
+    
+    def add_attr(self, key:str, value:str) -> None:
+        self.data[key] = value
 
 class MangaLib:
     def __init__(self) -> None:
@@ -32,7 +42,10 @@ class MangaLib:
         return buff
 
     def add_manga(self, manga:Manga) -> None:
-        self.list_manga.append(Manga(manga.name,manga.autor,manga.type,manga.tome_numero))
+        buff_manga=Manga(manga.name,manga.autor,manga.type,manga.tome_numero)
+        now=datetime.datetime.now()
+        buff_manga.add_attr("time","{}-{}-{} {}:{}:{}".format(now.year, now.month, now.day, now.hour, now.minute, now.second))
+        self.list_manga.append(buff_manga)
     
     def del_manga(self, name:str, autor="", type="") -> None:
         generator = self.find_manga(name,autor,type)
@@ -54,3 +67,6 @@ class MangaLib:
         match sort_category:
             case "name":
                 self.list_manga.sort(key=lambda Manga: Manga.name)
+    
+    def get(self):
+        return self.list_manga
