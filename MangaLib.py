@@ -50,7 +50,7 @@ class MangaLib:
                         yield elt
                 yield elt
 
-    def sort_MangaLib(self,sort_category="name"):
+    def sort_manga(self,sort_category="name"):
         match sort_category:
             case "name":
                 self.list_manga.sort(key=lambda Manga: Manga.name)
