@@ -22,32 +22,35 @@ class Manga:
 
 class MangaLib:
     def __init__(self) -> None:
-        self.biblio = [Manga()]
-        self.biblio.pop()
+        self.list_manga = [Manga()]
+        self.list_manga.pop()
     
     def __repr__(self) -> str:
         buff = ""
-        for elt in self.biblio:
+        for elt in self.list_manga:
             buff += elt.__repr__()
         return buff
 
     def add_manga(self, manga:Manga) -> None:
-        self.biblio.append(Manga(manga.name,manga.autor,manga.type,manga.tome_numero))
+        self.list_manga.append(Manga(manga.name,manga.autor,manga.type,manga.tome_numero))
     
     def del_manga(self, name:str, autor="", type="") -> None:
-        corresponding_manga = self.find_manga(name,autor,type)
-        check = "N"
-        while check.upper() != "Y":
-            corresponding_manga = self.find_manga(name,autor,type)
-            print(corresponding_manga)
-            check = input("Is the good manga ? Y/N")
-            if check.upper() == "Y":
-                self.biblio.remove(corresponding_manga)
+        generator = self.find_manga(name,autor,type)
+        for elt in generator:
+                print(elt)
+                if input("Is the good one ?y/n\n").upper()=="Y":
+                    self.list_manga.remove(elt)
+                    generator.close()
         
     def find_manga(self, name:str, autor="", type="") -> Manga:
-        for elt in self.biblio:
+        for elt in self.list_manga:
             if elt.name == name:
                 if elt.autor == autor: 
                     if elt.type == type:
                         yield elt
                 yield elt
+
+    def sort_MangaLib(self,sort_category="name"):
+        match sort_category:
+            case "name":
+                self.list_manga.sort(key=lambda Manga: Manga.name)
