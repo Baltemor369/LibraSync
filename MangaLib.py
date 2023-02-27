@@ -6,13 +6,14 @@ class Manga:
         self.autor = creator
         self.type = type
         self.volume_number = volume_nb
-        # un dictionnaire dans lequel on peut ajouter toutes données connaissable apres l'initialisation comme l'heure d'ajout à la manga library 
-        self.data={}
+        self.time = ""
+        self.description = ""
+        self.valuation = 0/10
 
     def __repr__(self) -> str:
-        buff = f"Name : {self.name} \nAutor : {self.autor} \nType : {self.type} \nNumber of volume : {self.volume_number} \n"
-        for key in self.data:
-            buff += str(key)+" : "+self.data[key]+"\n"
+        buff = f"Name : {self.name} \nAutor : {self.autor} \nType : {self.type} \n"
+        buff += f"Number of volume : {self.volume_number} \nDescription : {self.description} \n"
+        buff += f"Valuation : {self.valuation*10}/10 \nTime : {self.time} \n"
         buff += "\n"
         return buff
 
@@ -27,9 +28,6 @@ class Manga:
 
     def change_name(self, new_name:str) -> None:
         self.name = new_name
-    
-    def add_attr(self, key:str, value:str) -> None:
-        self.data[key] = value
 
 class MangaLib:
     def __init__(self) -> None:
@@ -45,7 +43,7 @@ class MangaLib:
     def add_manga(self, manga:Manga) -> None:
         buff_manga=Manga(manga.name,manga.autor,manga.type,manga.volume_number)
         now=datetime.datetime.now()
-        buff_manga.add_attr("time","{}-{}-{} {}:{}:{}".format(now.year, now.month, now.day, now.hour, now.minute, now.second))
+        buff_manga.time = "{}-{}-{} {}:{}:{}".format(now.year, now.month, now.day, now.hour, now.minute, now.second)
         self.list_manga.append(buff_manga)
     
     def del_manga(self, name:str, autor="", type="") -> None:
@@ -69,13 +67,15 @@ class MangaLib:
             case "name":
                 self.list_manga.sort(key=lambda Manga: Manga.name)
             case "time":
-                self.list_manga.sort(key=lambda Manga: Manga.data["time"])
+                self.list_manga.sort(key=lambda Manga: Manga.time)
             case "type":
                 self.list_manga.sort(key=lambda Manga: Manga.type)
             case "volume number":
                 self.list_manga.sort(key=lambda Manga: Manga.volume_number)
             case "autor":
                 self.list_manga.sort(key=lambda Manga: Manga.autor)
+            case "valuation":
+                self.list_manga.sort(key=lambda Manga: Manga.valuation)
     
     def get(self):
         return self.list_manga
