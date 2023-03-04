@@ -1,4 +1,31 @@
 import datetime, tkinter as tk, pickle, re
+from typing import List
+
+class Stat:
+    def __init__(self, name="", counter=0) -> None:
+        self.name = name
+        self.counter = counter
+    
+    def increment(self) -> None:
+        self.counter += 1
+
+class StatList:
+    def __init__(self) -> None:
+        self.list:List[Stat] = []
+    
+    def already_exist(self, name:str):
+        for elt in self.list:
+            if elt == name:
+                return True
+        return False
+
+    def add_stat(self, name:str, counter=1) -> None:
+        self.list.append(Stat(name, counter))
+
+    def increment(self, name:str) -> None:
+        for elt in self.list:
+            if elt.name == name:
+                elt.increment()
 
 class Manga:
     def __init__(self, name="",  author="", type="", volume_nb=0, description="", valuation=0.0) -> None:
@@ -14,7 +41,7 @@ class Manga:
     def __repr__(self) -> str:
         buff = f"Name : {self.name} \nAutor : {self.author} \nType : {self.type} \n"
         buff += f"Number of volume : {self.volume_number} \nDescription : {self.description} \n"
-        buff += f"Valuation : {self.valuation}/10 \nTime : {self.time} \n"
+        buff += f"Valuation : {self.valuation}/10 \nTime : {self._time} \n"
         buff += "\n"
         return buff
 
@@ -42,7 +69,7 @@ class Manga:
 
 class MangaLib:
     def __init__(self) -> None:
-        self.list_manga = []
+        self.list_manga:List[Manga] = []
 
     def __repr__(self) -> str:
         buff = ""
@@ -66,7 +93,7 @@ class MangaLib:
         self.list_manga[index].change_valuation(manga.valuation)
 
     def del_manga(self, name="", author="", type="", index="") -> None:
-        if re.match("^[0-9]+$", str(index)) is not None: # if the index is a number
+        if re.match("^\d+$", str(index)) is not None: # if the index is a number
             self.list_manga.pop(index) # removes the manga at the specified index
         else:
             # finds a manga with the specified attributes
@@ -88,32 +115,56 @@ class MangaLib:
                 # returns the manga if it matches the name only
                 yield elt 
                   
-    def sort_manga(self,sort_category="name"):
+    def sort_manga(self,sort_category="name") -> None:
         match sort_category:
             case "name":
                 self.list_manga.sort(key=lambda Manga: Manga.name) 
-            case "time":
-                self.list_manga.sort(key=lambda Manga: Manga.time) 
+            case "_time":
+                self.list_manga.sort(key=lambda Manga: Manga._time) 
             case "type":
                 self.list_manga.sort(key=lambda Manga: Manga.type) 
-            case "volume number":
+            case "volume_number":
                 self.list_manga.sort(key=lambda Manga: Manga.volume_number) 
             case "author":
                 self.list_manga.sort(key=lambda Manga: Manga.author) 
             case "valuation":
                 self.list_manga.sort(key=lambda Manga: Manga.valuation)
     
-    def get(self):
+    def get(self) -> List[Manga]:
         return self.list_manga
+    
+    def get_names(self) -> List[str]:
+        buff = []
+        for elt in self.get():
+            buff.append(elt.name)
+        return buff
+    
+    def get_authors(self) -> List[str]:
+        buff = []
+        for elt in self.get():
+            buff.append(elt.author)
+        return buff
+    
+    def get_types(self) -> List[str]:
+        buff = []
+        for elt in self.get():
+            buff.append(elt.type)
+        return buff
+    
+    def get_valuations(self) -> List[int]:
+        buff = []
+        for elt in self.get():
+            buff.append(elt.valuation)
+        return buff
 
     # Function to save the datas in a file
-    def save_data(self):
+    def save_data(self) -> None:
         with open("data","wb") as file:
             pickler = pickle.Pickler(file)
             pickler.dump(self.list_manga)
     
     # Function to retrieve the datas saved
-    def backup(self):
+    def backup(self) -> None:
         with open("data","rb") as file:
             unpickler = pickle.Unpickler(file)
             self.list_manga = unpickler.load()
@@ -124,8 +175,14 @@ class UI(tk.Tk):
         self.title("Manga Library")
 
         self.library = MangaLib()
+        self.sort_key = "name"
         
+        # catcch Escap key press
+        self.bind("<Escape>",self.exit)
+        # retrieve manga library already saved in "data" file
         self.library.backup()
+
+        self.library.sort_manga()
 
         self.display_menu()
     
@@ -143,7 +200,8 @@ class UI(tk.Tk):
         add_manga_button = tk.Button(self, width=10, text="Add Manga", command=self.display_modification)
         add_manga_button.pack(pady=10)
 
-        stat_button = tk.Button(self, width=10, text="Stats", command=self.display_stats)
+        stat_button = tk.Button(self, width=10, text="Stats")
+        stat_button.pack(pady=10)
         
         exit_button = tk.Button(self, width=10, text="Exit", command=self.exit)
         exit_button.pack(pady=10)
@@ -153,6 +211,7 @@ class UI(tk.Tk):
         frame_top = tk.Frame(self)
         frame_top.pack()
         self.set_geometry(950,300)
+
         self.create_tab(frame_top)
         
         frame_bottom = tk.Frame(self)
@@ -167,7 +226,7 @@ class UI(tk.Tk):
     def display_modification(self, index=""):
         self.clear()
         
-        self.set_geometry(300,200 + 50 * (re.match("^[0-9]+$", str(index))!=None))
+        self.set_geometry(300,200 + 50 * (re.match("^\d+$", str(index))!=None))
 
         # Creating a top Frame top for arranging labels/Entry and buttons 
         frame_top = tk.Frame(self)
@@ -185,7 +244,7 @@ class UI(tk.Tk):
             if key =="volume_nb":
                 label = tk.Label(frame_label, text="volume number :")
                 label.pack(side="left")
-            if key != "time" and key != "modify":
+            if key != "_time" and key != "modify":
                 label = tk.Label(frame_label, text=f"{key} :")
                 label.pack(side="left")
         
@@ -202,42 +261,42 @@ class UI(tk.Tk):
             match key:
                 case "name":
                     buff_name = tk.StringVar(self)
-                    if re.match("^[0-9]+$", str(index)):
+                    if re.match("^\d+$", str(index)):
                         buff_name.set(self.library.get()[index].name)
                     self.name_entry = tk.Entry(frame_column, textvariable=buff_name, justify=tk.LEFT)
                     self.name_entry.pack(side="top")
 
                 case "author":
                     buff_author = tk.StringVar(self)
-                    if re.match("^[0-9]+$", str(index)):
+                    if re.match("^\d+$", str(index)):
                         buff_author.set(self.library.get()[index].author)
                     self.author_entry = tk.Entry(frame_column, textvariable=buff_author, justify=tk.LEFT)
                     self.author_entry.pack(side="top")
 
                 case "type":
                     buff_type = tk.StringVar(self)
-                    if re.match("^[0-9]+$", str(index)):
+                    if re.match("^\d+$", str(index)):
                         buff_type.set(self.library.get()[index].type)
                     self.type_entry = tk.Entry(frame_column, textvariable=buff_type, justify=tk.LEFT)
                     self.type_entry.pack(side="top")
 
                 case "volume_number":
                     buff_volume_nb = tk.StringVar(self)
-                    if re.match("^[0-9]+$", str(index)):
+                    if re.match("^\d+$", str(index)):
                         buff_volume_nb.set(self.library.get()[index].volume_number)
                     self.volume_nb_entry = tk.Entry(frame_column, textvariable=buff_volume_nb, justify=tk.LEFT)
                     self.volume_nb_entry.pack(side="top")
 
                 case "description":
                     buff_description = tk.StringVar(self)
-                    if re.match("^[0-9]+$", str(index)):
+                    if re.match("^\d+$", str(index)):
                         buff_description.set(self.library.get()[index].description)
                     self.description_entry = tk.Entry(frame_column, textvariable=buff_description, justify=tk.LEFT)
                     self.description_entry.pack(side="top")
 
                 case "valuation":
                     buff_valuation = tk.StringVar(self)
-                    if re.match("^[0-9]+$", str(index)):
+                    if re.match("^\d+$", str(index)):
                         buff_valuation.set(self.library.get()[index].valuation)
                     self.valuation_entry = tk.Entry(frame_column, textvariable=buff_valuation, justify=tk.LEFT)
                     self.valuation_entry.pack(side="top")
@@ -251,7 +310,7 @@ class UI(tk.Tk):
         add_button.pack(side="top")
 
         # Display of delete button if it is an element modification
-        if re.match("^[0-9]+$", str(index)) is not None:
+        if re.match("^\d+$", str(index)) is not None:
             del_button = tk.Button(frame_bottom, width=5, text="Delete", command=lambda index=index: self.delete_manga(index))
             del_button.pack(side="top", pady=10)
         
@@ -260,12 +319,38 @@ class UI(tk.Tk):
         back_button.pack(side="top")
 
     def display_stats(self):
-        # total manga
-        # total par type
-        # total par auteur
-        # nb de manga ajouter derniere semaine/moi/année
-        # évaluation statistique(moyen ecart type etc)
         pass
+
+    def calcul_stats(self):
+        # total manga
+        total_manga = len(self.library.get())
+        
+        #total by type
+        stat_type = StatList()
+
+        buff_types = self.library.get_types()
+        for elt in buff_types:
+            if stat_type.already_exist(elt):
+                stat_type.increment(elt)
+            else:
+                stat_type.add_stat(elt)
+
+        # total par auteur
+        stat_author = StatList()
+
+        buff_authors = self.library.get_authors()
+        
+        for elt in buff_authors:
+            if stat_author.already_exist(elt):
+                stat_author.increment(elt)
+            else:
+                stat_author.add_stat(elt)
+        
+        # nb de manga ajouter derniere semaine/moi/année
+
+        # évaluation statistique(moyen ecart type etc)
+        valuations = self.library.get_valuations()
+
 
     def modification(self, index=""):
         # recovery input datas
@@ -276,34 +361,39 @@ class UI(tk.Tk):
         description_get = self.description_entry.get()
         valuation_get = self.valuation_entry.get()
 
-        # check in input datas
+        # Check in input datas
         data_verify = True
-        # if @name_get, @author_et, @type_get et @description_get 
-        # only possess letters or numbers 
-        if re.match("^[a-zA-Z0-9 ,.]+$",name_get) is None:
+
+        # Creating regex exp for the check in input data
+        # allow alphanumeric characters and "," "." "-" " "
+        reg_text = r"^[\w,\.\- ^_]+$"
+        # allow list of int separate by "," or "-"
+        reg_volume = r"^(?:\d((?:(?:,\d)|(?:-\d))*))$"
+        # allow int and float between 0 and 10 included
+        reg_valuation = r"^(?:10(?:\.0)?|\d(?:\.\d)?)$"
+
+        if re.match(reg_text,name_get) is None:
             data_verify = False
-        if re.match("^[a-zA-Z0-9 ,.]+$",author_get) is None:
+        if re.match(reg_text,author_get) is None:
             data_verify = False
-        if re.match("^[a-zA-Z0-9 ,.]+$",type_get) is None:
+        if re.match(reg_text,type_get) is None:
             data_verify = False
-        if re.match("^[a-zA-Z0-9 ,.]+$",description_get) is None:
+        if re.match(reg_text,description_get) is None:
             data_verify = False
-        # if @volume_nb_get, @valuation_get
-        # only possess number with optional "."
-        if re.match("^[0-9.]+$",volume_nb_get) is None:
+        if re.match(reg_volume,volume_nb_get) is None:
             data_verify = False
-        if re.match("^[0-9.]+$",valuation_get) is None:
+        if re.match(reg_valuation,valuation_get) is None:
             data_verify = False
 
         if data_verify:
             # If @index is given
-            if re.match("^[0-9]+$", str(index)):
+            if re.match("^\d+$", str(index)):
                 # modification of the manga at @index
                 self.library.modify_manga(Manga(name_get, author_get, type_get, int(volume_nb_get), description_get, float(valuation_get)),index)
                 self.library.save_data()
             else:
                 # add the manga to manga list
-                self.library.add_manga(Manga(name_get, author_get, type_get, volume_nb_get, description_get, valuation_get))
+                self.library.add_manga(Manga(name_get, author_get, type_get, int(volume_nb_get), description_get, float(valuation_get)))
                 self.library.save_data()
             
             # display the new library
@@ -324,7 +414,7 @@ class UI(tk.Tk):
             # Creation of the frame case for the headers
             frame_case = tk.Frame(frame_column,  height=1)
             frame_case.pack(side="top")
-
+            
             # Management of special cases due to type and size
             match key:
                 case "description":
@@ -338,6 +428,7 @@ class UI(tk.Tk):
                 case _:
                     text = tk.Label(frame_case, text=key, width=15, height=1, borderwidth=2, relief="solid")
                     text.pack()
+                    text.bind("<Button-1>", lambda evt,k=key: self.sort_my_lib(k))
             
             # tracking index in library scan
             index = 0
@@ -365,6 +456,11 @@ class UI(tk.Tk):
                             text.pack()
                 index += 1
     
+    def sort_my_lib(self, key:str):
+        self.sort_key=key
+        self.library.sort_manga(key)
+        self.display_library()
+
     def delete_manga(self, index:int):
         self.library.del_manga(index=index)
         self.library.save_data()
@@ -374,6 +470,6 @@ class UI(tk.Tk):
         for widget in self.winfo_children():
             widget.pack_forget()
     
-    def exit(self):
+    def exit(self, evt=""):
         self.library.save_data()
         self.destroy()
