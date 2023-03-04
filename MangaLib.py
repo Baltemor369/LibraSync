@@ -115,20 +115,20 @@ class MangaLib:
                 # returns the manga if it matches the name only
                 yield elt 
                   
-    def sort_manga(self,sort_category="name") -> None:
+    def sort_manga(self,sort_category="name", reverse=False) -> None:
         match sort_category:
             case "name":
-                self.list_manga.sort(key=lambda Manga: Manga.name) 
+                self.list_manga.sort(key=lambda Manga: Manga.name, reverse=reverse) 
             case "_time":
-                self.list_manga.sort(key=lambda Manga: Manga._time) 
+                self.list_manga.sort(key=lambda Manga: Manga._time, reverse=reverse)
             case "type":
-                self.list_manga.sort(key=lambda Manga: Manga.type) 
+                self.list_manga.sort(key=lambda Manga: Manga.type, reverse=reverse)
             case "volume_number":
-                self.list_manga.sort(key=lambda Manga: Manga.volume_number) 
+                self.list_manga.sort(key=lambda Manga: Manga.volume_number, reverse=reverse)
             case "author":
-                self.list_manga.sort(key=lambda Manga: Manga.author) 
+                self.list_manga.sort(key=lambda Manga: Manga.author, reverse=reverse)
             case "valuation":
-                self.list_manga.sort(key=lambda Manga: Manga.valuation)
+                self.list_manga.sort(key=lambda Manga: Manga.valuation, reverse=reverse)
     
     def get(self) -> List[Manga]:
         return self.list_manga
@@ -176,13 +176,15 @@ class UI(tk.Tk):
 
         self.library = MangaLib()
         self.sort_key = "name"
+        self.sort_reverse = False
+        
+        self.library.sort_manga(self.sort_key)
         
         # catcch Escap key press
         self.bind("<Escape>",self.exit)
+        
         # retrieve manga library already saved in "data" file
         self.library.backup()
-
-        self.library.sort_manga()
 
         self.display_menu()
     
@@ -193,6 +195,8 @@ class UI(tk.Tk):
         self.clear()
         
         self.set_geometry(200,200)
+
+        self.sort_key = "name"
 
         lib_button = tk.Button(self, width=10, text="My Library", command=self.display_library)
         lib_button.pack(pady=10)
@@ -426,7 +430,13 @@ class UI(tk.Tk):
                     button = tk.Button(frame_case, text="", relief="flat")
                     button.pack(anchor="center")
                 case _:
-                    text = tk.Label(frame_case, text=key, width=15, height=1, borderwidth=2, relief="solid")
+                    if key == self.sort_key:
+                        if self.sort_reverse:
+                            text = tk.Label(frame_case, text=f"{key} ▲", width=15, height=1, borderwidth=2, relief="solid")
+                        else:
+                            text = tk.Label(frame_case, text=f"{key} ▼", width=15, height=1, borderwidth=2, relief="solid")
+                    else:
+                        text = tk.Label(frame_case, text=key, width=15, height=1, borderwidth=2, relief="solid")
                     text.pack()
                     text.bind("<Button-1>", lambda evt,k=key: self.sort_my_lib(k))
             
@@ -457,8 +467,12 @@ class UI(tk.Tk):
                 index += 1
     
     def sort_my_lib(self, key:str):
-        self.sort_key=key
-        self.library.sort_manga(key)
+        if key == self.sort_key:
+            self.sort_reverse = not self.sort_reverse
+            self.library.sort_manga(key,self.sort_reverse)
+        else:
+            self.sort_key=key
+            self.library.sort_manga(key)
         self.display_library()
 
     def delete_manga(self, index:int):
