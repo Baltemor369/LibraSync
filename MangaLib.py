@@ -1,52 +1,62 @@
 import datetime, tkinter as tk, pickle, re
+import dateutil.relativedelta as dr
 from typing import List
 
-class Stat:
-    def __init__(self, name="", counter=0) -> None:
-        self.name = name
-        self.counter = counter
-    
-    def increment(self) -> None:
-        self.counter += 1
+# To do :
+# + Module recherche
+# + volume "1-4"=> du volume 1 au 4
+# + finir statistique
+# + développer module historique(moyenne par semaine/mois voir combien ont été ajout pendant une semaine donnée)
+# + refaire affichage stats
+# +
 
-class StatList:
+class CounterList:
     def __init__(self) -> None:
-        self.list:List[Stat] = []
+        self.counter_list = []
     
-    def already_exist(self, name:str):
-        for elt in self.list:
-            if elt == name:
+    def __repr__(self) -> str:
+        buff = "\n"
+        for elt in self.counter_list:
+            buff += f"{elt['name']} : {elt['counter']}\n"
+        return buff
+
+    def add_name(self, name:str) -> None:
+        if not self.check_name(name):
+            self.counter_list.append({'name': name, 'counter': 1})
+        else:
+            self.increment_counter(name)
+
+    def increment_counter(self, name:str) -> None:
+        for item in self.counter_list:
+            if item['name'] == name:
+                item['counter'] += 1
+
+    def check_name(self, name:str) -> bool:
+        for item in self.counter_list:
+            if item['name'] == name:
                 return True
         return False
 
-    def add_stat(self, name:str, counter=1) -> None:
-        self.list.append(Stat(name, counter))
-
-    def increment(self, name:str) -> None:
-        for elt in self.list:
-            if elt.name == name:
-                elt.increment()
-
 class Manga:
-    def __init__(self, name="",  author="", type="", volume_nb=0, description="", valuation=0.0) -> None:
+    def __init__(self, name="",  author="", type="", volume_nb=0, description="", valuation=0.0, time=datetime.datetime.now()) -> None:
         self.name = name
         self.author = author
         self.type = type
         self.volume_number = volume_nb
         self.description = description
         self.valuation = valuation
-        self._time = "" # Will be used to store the time at which the manga was added
+        self.time = time # Will be used to store the time at which the manga was added
         self.modify=""
 
     def __repr__(self) -> str:
         buff = f"Name : {self.name} \nAutor : {self.author} \nType : {self.type} \n"
         buff += f"Number of volume : {self.volume_number} \nDescription : {self.description} \n"
-        buff += f"Valuation : {self.valuation}/10 \nTime : {self._time} \n"
+        buff += f"Valuation : {self.valuation}/10 \nTime : {self.time.year}-{self.time.month}-{self.time.day} {self.time.hour}:{self.time.minute}:{self.time.second} \n"
         buff += "\n"
         return buff
 
     def __eq__(self, __o: object) -> bool:
-        return self.__dict__ == __o.__dict__        
+        return self.__dict__ == __o.__dict__
 
     def change_volume_number(self, new_value:int) -> None:
         self.volume_number = new_value
@@ -78,11 +88,7 @@ class MangaLib:
         return buff
 
     def add_manga(self, manga:Manga) -> None:
-        buff_manga=Manga(manga.name, manga.author, manga.type, manga.volume_number, manga.description, manga.valuation) 
-        now=datetime.datetime.now()
-        # stores the current time at which the manga is added
-        buff_manga._time = "{}-{}-{} {}:{}:{}".format(now.year, now.month, now.day, now.hour, now.minute, now.second)
-        self.list_manga.append(buff_manga) # adds the manga to the list
+        self.list_manga.append(Manga(manga.name, manga.author, manga.type, manga.volume_number, manga.description, manga.valuation, manga.time)) # adds the manga to the list
 
     def modify_manga(self, manga:Manga, index:int) -> None:
         self.list_manga[index].change_name(manga.name)
@@ -119,8 +125,8 @@ class MangaLib:
         match sort_category:
             case "name":
                 self.list_manga.sort(key=lambda Manga: Manga.name, reverse=reverse) 
-            case "_time":
-                self.list_manga.sort(key=lambda Manga: Manga._time, reverse=reverse)
+            case "time":
+                self.list_manga.sort(key=lambda Manga: Manga.time, reverse=reverse)
             case "type":
                 self.list_manga.sort(key=lambda Manga: Manga.type, reverse=reverse)
             case "volume_number":
@@ -151,7 +157,7 @@ class MangaLib:
             buff.append(elt.type)
         return buff
     
-    def get_valuations(self) -> List[int]:
+    def get_valuations(self) -> List[float]:
         buff = []
         for elt in self.get():
             buff.append(elt.valuation)
@@ -159,15 +165,49 @@ class MangaLib:
 
     # Function to save the datas in a file
     def save_data(self) -> None:
-        with open("data","wb") as file:
-            pickler = pickle.Pickler(file)
-            pickler.dump(self.list_manga)
+        with open("data.txt","w") as file:
+            i=0
+            for elt in self.get():
+                file.write(f"@#N-{str(elt.name)}#A-{str(elt.author)}#TY-{str(elt.type)}#VN-{str(elt.volume_number)}#D-{str(elt.description)}#VA-{str(elt.valuation)}#TI-{str(elt.time)}#@\n")
+                i += 1
     
     # Function to retrieve the datas saved
     def backup(self) -> None:
-        with open("data","rb") as file:
-            unpickler = pickle.Unpickler(file)
-            self.list_manga = unpickler.load()
+        self.read_file("data.txt")
+
+    def read_file(self, file_name:str):
+        all_manga = []
+        with open(file_name,"r") as file:
+            while 1:
+                buffer = file.readline()
+                if buffer != "":
+                    all_manga.append(buffer)
+                else:
+                    break
+        self.convert_data(all_manga)
+
+    def convert_data(self, mangas:List[str]):
+        name_r = r"#N-([\w,\.\- ^_]+)#"
+        author_r = r"#A-([\w,\.\- ^_]+)#"
+        type_r = r"#TY-([\w,\.\- ^_]+)#"
+        volume_nb_r = r"#VN-(\d{1,3})#"
+        description_r = r"#D-([\w ,\.\-^_]+)#"
+        valuation_r = r"#VA-(10(?:\.0)?|\d(?:\.\d)?)#"
+        time_r = r"#TI-(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})#"
+
+        format_string = "%Y-%m-%d %H:%M:%S"
+
+        for elt in mangas:
+            name = re.search(name_r,elt).group(1)
+            author = re.search(author_r,elt).group(1)
+            type = re.search(type_r,elt).group(1)
+            volume_nb = re.search(volume_nb_r,elt).group(1)
+            description = re.search(description_r,elt).group(1)
+            valuation = re.search(valuation_r,elt).group(1)
+            time = re.search(time_r,elt).group(1)
+            time = datetime.datetime.strptime(time,format_string)
+
+            self.add_manga(Manga(name,author,type,int(volume_nb),description,float(valuation),time))
 
 class UI(tk.Tk):
     def __init__(self) -> None:
@@ -204,7 +244,7 @@ class UI(tk.Tk):
         add_manga_button = tk.Button(self, width=10, text="Add Manga", command=self.display_modification)
         add_manga_button.pack(pady=10)
 
-        stat_button = tk.Button(self, width=10, text="Stats")
+        stat_button = tk.Button(self, width=10, text="Stats", command=self.display_stats)
         stat_button.pack(pady=10)
         
         exit_button = tk.Button(self, width=10, text="Exit", command=self.exit)
@@ -214,7 +254,7 @@ class UI(tk.Tk):
         self.clear()
         frame_top = tk.Frame(self)
         frame_top.pack()
-        self.set_geometry(950,300)
+        self.set_geometry(950,150+60*len(self.library.get()))
 
         self.create_tab(frame_top)
         
@@ -248,7 +288,7 @@ class UI(tk.Tk):
             if key =="volume_nb":
                 label = tk.Label(frame_label, text="volume number :")
                 label.pack(side="left")
-            if key != "_time" and key != "modify":
+            if key != "time" and key != "modify":
                 label = tk.Label(frame_label, text=f"{key} :")
                 label.pack(side="left")
         
@@ -323,38 +363,70 @@ class UI(tk.Tk):
         back_button.pack(side="top")
 
     def display_stats(self):
-        pass
+        self.clear()
+        
+        self.calcul_stats()
+        
+        self.set_geometry(300,100*len(self.library.get()))
+        
+        # refaire l'affichae => pas beau
+        for key in self.data_stat:
+            frame_row = tk.Frame(self)
+            frame_row.pack()
+            frame_case_key = tk.Frame(frame_row)
+            frame_case_key.pack(side="left")
+            label = tk.Label(frame_case_key,text=f"{key} : ")
+            label.pack()
+            frame_case_value = tk.Frame(frame_row)
+            frame_case_value.pack(side="left")
+            label = tk.Label(frame_case_value,text=f"{self.data_stat[key]}")
+            label.pack()
+
+        # back button
+        back_button = tk.Button(self, width=9, text="Return", command=self.display_menu)
+        back_button.pack(side="bottom",pady=5)
 
     def calcul_stats(self):
+        self.data_stat = {}
         # total manga
-        total_manga = len(self.library.get())
+        self.data_stat["Total mangas"] = len(self.library.get())
         
-        #total by type
-        stat_type = StatList()
+        # total by type
+        stat_type = CounterList()
 
-        buff_types = self.library.get_types()
-        for elt in buff_types:
-            if stat_type.already_exist(elt):
-                stat_type.increment(elt)
-            else:
-                stat_type.add_stat(elt)
-
+        for elt in self.library.get_types():
+            stat_type.add_name(elt)
+        self.data_stat["Total by type"] = stat_type
+        
         # total par auteur
-        stat_author = StatList()
+        stat_author = CounterList()
 
-        buff_authors = self.library.get_authors()
+        for elt in self.library.get_authors():
+            stat_author.add_name(elt)
+        self.data_stat["Total by author"] = stat_author
         
-        for elt in buff_authors:
-            if stat_author.already_exist(elt):
-                stat_author.increment(elt)
-            else:
-                stat_author.add_stat(elt)
-        
-        # nb de manga ajouter derniere semaine/moi/année
+        # total de manga ajouter derniere semaine/moi/année
+        # current time
+        now = datetime.datetime.now()
 
-        # évaluation statistique(moyen ecart type etc)
+        # counter definition
+        self.data_stat["Total last week"] = 0
+        self.data_stat["Total last month"] = 0
+        self.data_stat["Total last year"] = 0
+        
+        for elt in self.library.get():
+            delta = dr.relativedelta(now, elt.time)
+            if delta.days <= 7:
+                self.data_stat["Total last week"] += 1
+            if delta.months <=1:
+                self.data_stat["Total last month"] += 1
+            if delta.years <= 1:
+                self.data_stat["Total last year"] += 1
+        
         valuations = self.library.get_valuations()
 
+        self.data_stat["Average"] = round(sum(valuations)/len(valuations),2)
+        self.data_stat["Standard deviation"] = max(valuations) - min(valuations)
 
     def modification(self, index=""):
         # recovery input datas
@@ -372,7 +444,7 @@ class UI(tk.Tk):
         # allow alphanumeric characters and "," "." "-" " "
         reg_text = r"^[\w,\.\- ^_]+$"
         # allow list of int separate by "," or "-"
-        reg_volume = r"^(?:\d((?:(?:,\d)|(?:-\d))*))$"
+        reg_volume = r"^\d{1,3}$"
         # allow int and float between 0 and 10 included
         reg_valuation = r"^(?:10(?:\.0)?|\d(?:\.\d)?)$"
 
@@ -394,11 +466,11 @@ class UI(tk.Tk):
             if re.match("^\d+$", str(index)):
                 # modification of the manga at @index
                 self.library.modify_manga(Manga(name_get, author_get, type_get, int(volume_nb_get), description_get, float(valuation_get)),index)
-                self.library.save_data()
+                # self.library.save_data()
             else:
                 # add the manga to manga list
                 self.library.add_manga(Manga(name_get, author_get, type_get, int(volume_nb_get), description_get, float(valuation_get)))
-                self.library.save_data()
+                # self.library.save_data()
             
             # display the new library
             self.display_library()
@@ -477,7 +549,7 @@ class UI(tk.Tk):
 
     def delete_manga(self, index:int):
         self.library.del_manga(index=index)
-        self.library.save_data()
+        # self.library.save_data()
         self.display_library()
 
     def clear(self):
