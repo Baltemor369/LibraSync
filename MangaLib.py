@@ -10,6 +10,11 @@ from typing import List
 # + refaire affichage stats
 # +
 
+BORDER_WIDTH = 1
+RELIEF = "solid"
+WIDTH = 15
+HEIGHT = 2
+
 class CounterList:
     def __init__(self) -> None:
         self.counter_list = []
@@ -46,7 +51,7 @@ class Manga:
         self.description = description
         self.valuation = valuation
         self.time = time # Will be used to store the time at which the manga was added
-        self.modify=""
+        self.modify="M0d1Fy"
 
     def __repr__(self) -> str:
         buff = f"Name : {self.name} \nAutor : {self.author} \nType : {self.type} \n"
@@ -98,28 +103,19 @@ class MangaLib:
         self.list_manga[index].change_description(manga.description)
         self.list_manga[index].change_valuation(manga.valuation)
 
-    def del_manga(self, name="", author="", type="", index="") -> None:
+    def del_manga(self,index="") -> None:
         if re.match("^\d+$", str(index)) is not None: # if the index is a number
             self.list_manga.pop(index) # removes the manga at the specified index
-        else:
-            # finds a manga with the specified attributes
-            generator = self.find_manga(name,author,type) 
-            for elt in generator:
-                    print(elt)
-                    # asks the user to confirm if it's the right manga
-                    if input("Is the good one ?y/n\n").upper()=="Y": 
-                        self.list_manga.remove(elt)
-                        generator.close()
         
-    def find_manga(self, name:str, author="", type="") -> Manga:
+    def find_manga(self, name:str) -> Manga:
         for elt in self.list_manga:
-            if elt.name == name:
-                if elt.author == author: 
-                    if elt.type == type:
-                        # returns the manga if it matches all the attributes
-                        yield elt 
-                # returns the manga if it matches the name only
-                yield elt 
+            if len(name)<=len(elt.name):
+                for char_n, char_elt in zip(name.lower(), elt.name.lower()):
+                    check_char = True
+                    if char_n != char_elt:
+                        check_char = False
+                if check_char:
+                    yield elt
                   
     def sort_manga(self,sort_category="name", reverse=False) -> None:
         match sort_category:
@@ -168,6 +164,7 @@ class MangaLib:
         with open("data.txt","w") as file:
             i=0
             for elt in self.get():
+                elt.time = elt.time.replace(second=round(elt.time.second)) 
                 file.write(f"@#N-{str(elt.name)}#A-{str(elt.author)}#TY-{str(elt.type)}#VN-{str(elt.volume_number)}#D-{str(elt.description)}#VA-{str(elt.valuation)}#TI-{str(elt.time)}#@\n")
                 i += 1
     
@@ -225,11 +222,14 @@ class UI(tk.Tk):
         
         # retrieve manga library already saved in "data" file
         self.library.backup()
-
+        self.set_geometry(200,200,(self.winfo_screenwidth()-200)/3, (self.winfo_screenheight()-200)/3)
         self.display_menu()
     
-    def set_geometry(self, width:int, height:int):
-        self.geometry(f"{width}x{height}")
+    def set_geometry(self, width:int, height:int,x="",y=""):
+        if x and y != "":
+            self.geometry(f"{width}x{height}+{int(x)}+{int(y)}")
+        else:
+            self.geometry(f"{width}x{height}")
 
     def display_menu(self):
         self.clear()
@@ -252,12 +252,31 @@ class UI(tk.Tk):
 
     def display_library(self):
         self.clear()
-        frame_top = tk.Frame(self)
-        frame_top.pack()
+        
         self.set_geometry(950,150+60*len(self.library.get()))
 
-        self.create_tab(frame_top)
+        # Frame for the search bar
+        frame_top = tk.Frame(self)
+        frame_top.pack()
         
+        # Search bar
+        label = tk.Label(frame_top, text="Research : ")
+        label.pack(side="left")
+
+        search_name = tk.StringVar(self)
+        self.search_input = tk.Entry(frame_top, textvariable=search_name, width=50)
+        self.search_input.pack(side="left")
+        
+        self.search_input.bind("<KeyRelease>",self.research_bar)
+
+        tab = self.create_tab(self.library.get())
+
+        # Frame for the tab
+        frame_tab = tk.Frame(self)
+        frame_tab.pack()
+        self.display_tab(frame_tab,Manga().__dict__,tab)
+
+        # Frame for buttons modify and back
         frame_bottom = tk.Frame(self)
         frame_bottom.pack()
 
@@ -267,6 +286,57 @@ class UI(tk.Tk):
         back_button = tk.Button(frame_bottom, width=9, text="Return", command=self.display_menu)
         back_button.pack(pady=5)
     
+    def display_tab(self,root_frame:tk.Frame, header:dict,tab:List[List]):
+        frame_header = tk.Frame(root_frame)
+        frame_header.pack()
+        for key in header:
+            frame_case = tk.Frame(frame_header)
+            frame_case.pack(side="left")
+            match key:
+                case "description":
+                    label = tk.Label(frame_case, text="description", width=WIDTH, height=HEIGHT, relief=RELIEF, borderwidth=BORDER_WIDTH)
+                    label.pack()
+                case _:
+                    if self.sort_key==key:
+                        if self.sort_reverse:
+                            label = tk.Label(frame_case, text=f"{key} ▲", width=WIDTH, height=HEIGHT, relief=RELIEF, borderwidth=BORDER_WIDTH)
+                            label.pack()
+
+                        else:
+                            label = tk.Label(frame_case, text=f"{key} ▼", width=WIDTH, height=HEIGHT, relief=RELIEF, borderwidth=BORDER_WIDTH)
+                            label.pack()
+                    else:
+                        label = tk.Label(frame_case, text=f"{key}", width=WIDTH, height=HEIGHT, relief=RELIEF, borderwidth=BORDER_WIDTH)
+                        label.pack()
+                    label.bind("<Button-1>",lambda evt,k=key:self.sort_my_lib(k))
+        i = 0
+        for row in tab:
+            frame_row = tk.Frame(root_frame)
+            frame_row.pack()
+            for case in row:
+                frame_case = tk.Frame(frame_row)
+                frame_case.pack(side="left")
+                if case == "M0d1Fy":
+                    label = tk.Label(frame_case, text=case, width=WIDTH, height=HEIGHT, relief="raised", borderwidth=BORDER_WIDTH)
+                    label.pack()
+                    label.bind("<Button-1>",lambda evt,index=i:self.display_modification(index))
+                else:
+                    label = tk.Label(frame_case, text=case, width=WIDTH, height=HEIGHT, relief=RELIEF, borderwidth=BORDER_WIDTH)
+                    label.pack()
+            i += 1
+
+    def create_tab(self, data:List[Manga]):
+        tab:List[List] = []
+        row = []
+
+        for elt in data:
+            for key in elt.__dict__:
+                row.append(elt.__dict__[key])
+            tab.append(row.copy())
+            row.clear()
+        
+        return tab
+
     def display_modification(self, index=""):
         self.clear()
         
@@ -466,79 +536,27 @@ class UI(tk.Tk):
             if re.match("^\d+$", str(index)):
                 # modification of the manga at @index
                 self.library.modify_manga(Manga(name_get, author_get, type_get, int(volume_nb_get), description_get, float(valuation_get)),index)
-                # self.library.save_data()
+                self.library.save_data()
             else:
                 # add the manga to manga list
                 self.library.add_manga(Manga(name_get, author_get, type_get, int(volume_nb_get), description_get, float(valuation_get)))
-                # self.library.save_data()
+                self.library.save_data()
             
             # display the new library
             self.display_library()
             
-    def create_tab(self, root_frame:tk.Frame, align_side="top"):
-        # Global Frame pour display management
-        frame_tab = tk.Frame(root_frame)
-        frame_tab.pack(side=align_side)
-        
-        # Create table headers
-        for key in Manga().__dict__:
+ 
+    def research_bar(self, evt):
 
-            # Creation of columns for the layout and alignment of elements
-            frame_column = tk.Frame(frame_tab)
-            frame_column.pack(side="left")
-            
-            # Creation of the frame case for the headers
-            frame_case = tk.Frame(frame_column,  height=1)
-            frame_case.pack(side="top")
-            
-            # Management of special cases due to type and size
-            match key:
-                case "description":
-                    text = tk.Label(frame_case, text=key, width=20, height=1, borderwidth=2, relief="solid")
-                    text.pack()
-                case "modify":
-                    # Creating an invisible button
-                    # for alignment with table rows
-                    button = tk.Button(frame_case, text="", relief="flat")
-                    button.pack(anchor="center")
-                case _:
-                    if key == self.sort_key:
-                        if self.sort_reverse:
-                            text = tk.Label(frame_case, text=f"{key} ▲", width=15, height=1, borderwidth=2, relief="solid")
-                        else:
-                            text = tk.Label(frame_case, text=f"{key} ▼", width=15, height=1, borderwidth=2, relief="solid")
-                    else:
-                        text = tk.Label(frame_case, text=key, width=15, height=1, borderwidth=2, relief="solid")
-                    text.pack()
-                    text.bind("<Button-1>", lambda evt,k=key: self.sort_my_lib(k))
-            
-            # tracking index in library scan
-            index = 0
-            
-            # Creation of the boxes with the data according to @key
-            for elt in self.library.get():
+        search_word = self.search_input.get()
+
+        if search_word != "":
+            self.create_tab(self.library.find_manga(search_word))
                 
-                # Creation of the box for display management
-                frame_case = tk.Frame(frame_column)
-                frame_case.pack(fill="both", anchor="center")
+        
 
-                # Management of special cases due to type and size
-                match key:
-                        case "volume_number":
-                            text = tk.Label(frame_case, text=elt.__dict__[key], width=15, height=4, borderwidth=2, relief="solid")
-                            text.pack()
-                        case "description":
-                            text = tk.Label(frame_case, text=elt.__dict__[key], width=20, height=4, borderwidth=2, relief="solid")
-                            text.pack()
-                        case "modify":
-                            button = tk.Button(frame_case, text="modify", command=lambda i=index: self.display_modification(i))
-                            button.pack(padx=5, pady=20, anchor="center")
-                        case _:
-                            text = tk.Label(frame_case, text=elt.__dict__[key], width=15, height=4, borderwidth=2, relief="solid")
-                            text.pack()
-                index += 1
-    
     def sort_my_lib(self, key:str):
+        print(key)
         if key == self.sort_key:
             self.sort_reverse = not self.sort_reverse
             self.library.sort_manga(key,self.sort_reverse)
@@ -549,7 +567,7 @@ class UI(tk.Tk):
 
     def delete_manga(self, index:int):
         self.library.del_manga(index=index)
-        # self.library.save_data()
+        self.library.save_data()
         self.display_library()
 
     def clear(self):
