@@ -5,10 +5,9 @@ from typing import List
 # To do :
 # + Module recherche
 # + volume "1-4"=> du volume 1 au 4
-# + finir statistique
+# + faire alignement affichage statistique
 # + développer module historique(moyenne par semaine/mois voir combien ont été ajout pendant une semaine donnée)
-# + refaire affichage stats
-# +
+# + affichage label sur plusieur ligne
 
 BORDER_WIDTH = 1
 RELIEF = "solid"
@@ -253,7 +252,7 @@ class UI(tk.Tk):
     def display_library(self):
         self.clear()
         
-        self.set_geometry(950,150+60*len(self.library.get()))
+        self.set_geometry(950,150+40*len(self.library.get()))
 
         # Frame for the search bar
         frame_top = tk.Frame(self)
@@ -278,7 +277,7 @@ class UI(tk.Tk):
 
         # Frame for buttons modify and back
         frame_bottom = tk.Frame(self)
-        frame_bottom.pack()
+        frame_bottom.pack(pady=5)
 
         modification_B = tk.Button(frame_bottom,text="New Manga", width=9, relief="raised",command=self.display_modification)
         modification_B.pack(pady=5)
@@ -295,6 +294,9 @@ class UI(tk.Tk):
             match key:
                 case "description":
                     label = tk.Label(frame_case, text="description", width=WIDTH, height=HEIGHT, relief=RELIEF, borderwidth=BORDER_WIDTH)
+                    label.pack()
+                case "modify":
+                    label = tk.Label(frame_case, text="", width=WIDTH, height=HEIGHT, relief="flat", borderwidth=0)
                     label.pack()
                 case _:
                     if self.sort_key==key:
@@ -317,25 +319,13 @@ class UI(tk.Tk):
                 frame_case = tk.Frame(frame_row)
                 frame_case.pack(side="left")
                 if case == "M0d1Fy":
-                    label = tk.Label(frame_case, text=case, width=WIDTH, height=HEIGHT, relief="raised", borderwidth=BORDER_WIDTH)
+                    label = tk.Label(frame_case, text="Modify", width=WIDTH, height=HEIGHT, relief="raised", borderwidth=BORDER_WIDTH)
                     label.pack()
                     label.bind("<Button-1>",lambda evt,index=i:self.display_modification(index))
                 else:
-                    label = tk.Label(frame_case, text=case, width=WIDTH, height=HEIGHT, relief=RELIEF, borderwidth=BORDER_WIDTH)
+                    label = tk.Label(frame_case, text=case, wraplength=150, width=WIDTH, height=HEIGHT, relief=RELIEF, borderwidth=BORDER_WIDTH)
                     label.pack()
             i += 1
-
-    def create_tab(self, data:List[Manga]):
-        tab:List[List] = []
-        row = []
-
-        for elt in data:
-            for key in elt.__dict__:
-                row.append(elt.__dict__[key])
-            tab.append(row.copy())
-            row.clear()
-        
-        return tab
 
     def display_modification(self, index=""):
         self.clear()
@@ -498,6 +488,18 @@ class UI(tk.Tk):
         self.data_stat["Average"] = round(sum(valuations)/len(valuations),2)
         self.data_stat["Standard deviation"] = max(valuations) - min(valuations)
 
+    def create_tab(self, data:List[Manga]):
+        tab:List[List] = []
+        row = []
+
+        for elt in data:
+            for key in elt.__dict__:
+                row.append(elt.__dict__[key])
+            tab.append(row.copy())
+            row.clear()
+        
+        return tab
+
     def modification(self, index=""):
         # recovery input datas
         name_get = self.name_entry.get()
@@ -556,7 +558,6 @@ class UI(tk.Tk):
         
 
     def sort_my_lib(self, key:str):
-        print(key)
         if key == self.sort_key:
             self.sort_reverse = not self.sort_reverse
             self.library.sort_manga(key,self.sort_reverse)
