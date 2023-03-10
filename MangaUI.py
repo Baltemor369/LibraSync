@@ -1,6 +1,7 @@
 import tkinter as tk
 import dateutil.relativedelta as dr
 import re
+import os
 import datetime
 from typing import List
 
@@ -308,19 +309,25 @@ class UI(tk.Tk):
         # total manga
         self.data_stat["Total mangas"] = len(self.all_manga.get())
         
+        # total by names
+        stat_name = CounterList()
+        for elt in self.all_manga.get_all_names():
+            stat_name.add_name(elt)
+        self.data_stat["Total by names"] = stat_name
+
         # total by type
         stat_type = CounterList()
 
-        for elt in self.all_manga.get_types():
+        for elt in self.all_manga.get_all_types():
             stat_type.add_name(elt)
-        self.data_stat["Total by type"] = stat_type
+        self.data_stat["Total by types"] = stat_type
         
         # total par auteur
         stat_author = CounterList()
 
-        for elt in self.all_manga.get_authors():
+        for elt in self.all_manga.get_all_authors():
             stat_author.add_name(elt)
-        self.data_stat["Total by author"] = stat_author
+        self.data_stat["Total by authors"] = stat_author
         
         # current time
         now = datetime.datetime.now()
@@ -339,10 +346,10 @@ class UI(tk.Tk):
             if delta.years <= 1:
                 self.data_stat["Total last year"] += 1
         
-        valuations = self.all_manga.get_valuations()
+        valuations = self.all_manga.get_all_valuations()
 
-        self.data_stat["Average"] = round(sum(valuations)/len(valuations),2)
-        self.data_stat["Standard deviation"] = max(valuations) - min(valuations)
+        self.data_stat["Valuation average"] = round(sum(valuations)/len(valuations),2)
+        self.data_stat["Valuation standard deviation"] = max(valuations) - min(valuations)
     
     def delete_manga(self, index:int):
         self.all_manga.del_manga(index)
