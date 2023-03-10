@@ -7,7 +7,7 @@ from Manga import Manga
 # + volume "1-4"=> du volume 1 au 4
 # + faire alignement affichage statistique
 # + développer module historique(moyenne par semaine/mois voir combien ont été ajout pendant une semaine donnée)
-# + verifier que le dossier data existe (os .path.exists .makedirs)
+# + vérifier que le dossier data existe (os .path.exists .makedirs)
 
 """
 faire un executable : in cmd
@@ -28,7 +28,8 @@ class MangaLib:
         return buff
 
     def add_manga(self, manga:Manga) -> None:
-        self.list_manga.append(manga) # adds the manga to the list
+        if not self.is_in(manga):
+            self.list_manga.append(manga) # adds the manga to the list
     
     def del_manga(self,ID=-1) -> None:
         if 0 <= ID < len(self.get()):
@@ -191,6 +192,13 @@ class MangaLib:
 
             self.add_manga(Manga(int(ID), name, author, type, int(volume_nb), description, float(valuation), time))
     
+    def is_in(self, manga:Manga):
+        for elt in self.get():
+            if elt == manga:
+                return True
+        return False
+            
+
     def get_new_id(self):
         self.sort_manga("ID")
 
