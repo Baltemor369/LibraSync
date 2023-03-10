@@ -18,6 +18,6 @@ def random_manga(ID:int):
     
     volume_number = int(rd.randrange(1,100))
     
-    valuation = float(rd.randrange(1,101,5)/10)
+    valuation = float(rd.randrange(1,11))
         
     return Manga(ID,str(name),str(author),str(type),volume_number,"None",valuation)
