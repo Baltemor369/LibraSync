@@ -1,5 +1,6 @@
 import datetime
 import re
+import os
 from typing import List
 from Manga import Manga
 
@@ -146,6 +147,8 @@ class MangaLib:
 
     # Function to save the datas in a file
     def save_data(self) -> None:
+        if not os.path.exists("data"):
+            os.makedirs("data")
         with open(FILE_PATH,"w") as file:
             self.sort_manga("name")
             for i,elt in enumerate(self.get()):
@@ -154,9 +157,10 @@ class MangaLib:
     
     # Function to retrieve the datas saved
     def backup(self) -> None:
-        self.read_file(FILE_PATH)
+        if os.path.exists("data"):
+            self.read_file(FILE_PATH)
 
-    def read_file(self, file_name:str):
+    def read_file(self, file_name:str) -> None:
         list_mangas = []
         with open(file_name,"r") as file:
             while 1:
@@ -167,7 +171,7 @@ class MangaLib:
                     break
         self.convert_data(list_mangas)
 
-    def convert_data(self, mangas:List[str]):
+    def convert_data(self, mangas:List[str]) -> None:
         id_r = r"#ID-(\d+)#"
         name_r = r"#N-([\w,\.\- ^_]+)#"
         author_r = r"#A-([\w,\.\- ^_]+)#"
@@ -192,7 +196,7 @@ class MangaLib:
 
             self.add_manga(Manga(int(ID), name, author, type, int(volume_nb), description, float(valuation), time))
     
-    def is_in(self, manga:Manga):
+    def is_in(self, manga:Manga) -> bool:
         for elt in self.get():
             if elt == manga:
                 return True
