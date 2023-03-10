@@ -101,7 +101,7 @@ class UI(tk.Tk):
 
     def display_tab(self, root_frame:tk.Frame ,data:MangaLib):
         
-        self.set_geometry(950,100+40*len(self.all_manga.get()))
+        self.set_geometry(950,150+25*len(self.all_manga.get()))
 
         self.table_frame = tk.Frame(root_frame)
         self.table_frame.pack()
