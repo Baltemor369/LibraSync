@@ -153,20 +153,22 @@ class MangaLib:
     
     # Function to retrieve the datas saved
     def recover_data(self) -> bool:
-        if os.path.exists("data"):
-            return self.read_file(FILE_PATH)
-        else:
-            return False
+        if not os.path.exists("data"):
+            os.makedirs("data")
+        return self.read_file(FILE_PATH)
+            
 
-    def read_file(self, file_name:str) -> bool:
+    def read_file(self, file_path:str) -> bool:
         list_mangas = []
-        with open(file_name,"r") as file:
+        with open(file_path,"r") as file:
             while 1:
                 buffer = file.readline()
                 if buffer != "":
                     list_mangas.append(buffer)
                 else:
                     break
+            if len(list_mangas)==0:
+                return True
         return self.convert_data(list_mangas)
 
     def convert_data(self, mangas:List[str]) -> bool:
