@@ -4,12 +4,6 @@ import os
 from typing import List
 from Manga import Manga
 
-# To do :
-# + volume "1-4"=> du volume 1 au 4
-# + faire alignement affichage statistique
-# + développer module historique(moyenne par semaine/mois voir combien ont été ajout pendant une semaine donnée)
-# + vérifier que le dossier data existe (os .path.exists .makedirs)
-
 """
 faire un executable : in cmd
 - pyinstaller --name=mon_programme --onefile --windowed mon_programme.py
@@ -151,16 +145,20 @@ class MangaLib:
             os.makedirs("data")
         with open(FILE_PATH,"w") as file:
             self.sort_manga("name")
-            for i,elt in enumerate(self.get()):
+            for elt in self.get():
                 elt.time = elt.time.replace(microsecond=0)
-                file.write(f"@#ID-{str(elt.Primary_key)}#N-{str(elt.name)}#A-{str(elt.author)}#TY-{str(elt.type)}#VN-{str(elt.volume_number)}#D-{str(elt.description)}#VA-{str(elt.valuation)}#TI-{str(elt.time)}#@\n")
+                buffer = f"@#ID-{str(elt.Primary_key)}#N-{str(elt.name)}#A-{str(elt.author)}#TY-{str(elt.type)}"
+                buffer += f"#VN-{str(elt.volume_number)}#D-{str(elt.description)}#VA-{str(elt.valuation)}#TI-{str(elt.time)}#@\n"
+                file.write(buffer)
     
     # Function to retrieve the datas saved
-    def backup(self) -> None:
+    def recover_data(self) -> bool:
         if os.path.exists("data"):
-            self.read_file(FILE_PATH)
+            return self.read_file(FILE_PATH)
+        else:
+            return False
 
-    def read_file(self, file_name:str) -> None:
+    def read_file(self, file_name:str) -> bool:
         list_mangas = []
         with open(file_name,"r") as file:
             while 1:
@@ -169,14 +167,14 @@ class MangaLib:
                     list_mangas.append(buffer)
                 else:
                     break
-        self.convert_data(list_mangas)
+        return self.convert_data(list_mangas)
 
-    def convert_data(self, mangas:List[str]) -> None:
+    def convert_data(self, mangas:List[str]) -> bool:
         id_r = r"#ID-(\d+)#"
         name_r = r"#N-([\w,\.\- ^_]+)#"
         author_r = r"#A-([\w,\.\- ^_]+)#"
         type_r = r"#TY-([\w,\.\- ^_]+)#"
-        volume_nb_r = r"#VN-(\d{1,3})#"
+        volume_nb_r = r"#VN-(\d+)#"
         description_r = r"#D-([\w ,\.\-^_]+)#"
         valuation_r = r"#VA-(10(?:\.0)?|\d(?:\.\d)?)#"
         time_r = r"#TI-(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})#"
@@ -184,17 +182,21 @@ class MangaLib:
         format_string = "%Y-%m-%d %H:%M:%S"
         
         for elt in mangas:
-            ID = re.search(id_r,elt).group(1)
-            name = re.search(name_r,elt).group(1)
-            author = re.search(author_r,elt).group(1)
-            type = re.search(type_r,elt).group(1)
-            volume_nb = re.search(volume_nb_r,elt).group(1)
-            description = re.search(description_r,elt).group(1)
-            valuation = re.search(valuation_r,elt).group(1)
-            time = re.search(time_r,elt).group(1)
-            time = datetime.datetime.strptime(time,format_string)
-
-            self.add_manga(Manga(int(ID), name, author, type, int(volume_nb), description, float(valuation), time))
+            try:
+                ID = re.search(id_r,elt).group(1)
+                name = re.search(name_r,elt).group(1)
+                author = re.search(author_r,elt).group(1)
+                type = re.search(type_r,elt).group(1)
+                volume_nb = re.search(volume_nb_r,elt).group(1)
+                description = re.search(description_r,elt).group(1)
+                valuation = re.search(valuation_r,elt).group(1)
+                time = re.search(time_r,elt).group(1)
+                time = datetime.datetime.strptime(time,format_string)
+                self.add_manga(Manga(int(ID), name, author, type, int(volume_nb), description, float(valuation), time))
+            except:
+                return False
+        return True
+            
     
     def is_in(self, manga:Manga) -> bool:
         for elt in self.get():
