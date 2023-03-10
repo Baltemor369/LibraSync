@@ -1,4 +1,4 @@
-from MangaUI import UI
+from modules.MangaUI import UI
 
 # To do :
 # + volume "1-4"=> du volume 1 au 4
