@@ -1,39 +1,39 @@
 import tkinter as tk
 import dateutil.relativedelta as dr
 import re
-import os
 import datetime
-from typing import List
-
 from MangaLib import MangaLib
 from Manga import Manga
 from CounterList import CounterList
 
 RELIEF = "solid"
 BORDER_WIDTH = 2
+BACKUP_ERR_MSG = "Data recovery cannot be done\nThe file has been modified"
 
 class UI(tk.Tk):
     def __init__(self) -> None:
         tk.Tk.__init__(self)
         self.title("Manga Library")
         
+        # listen Escap key press to exit
+        self.bind("<Escape>",self.exit)
+
         # Create our Manga Library 
         self.all_manga = MangaLib()
-        # recover the datas
-        self.all_manga.backup()
 
-        # Create a second l
-        self.all_manga = MangaLib(self.all_manga.get().copy()) 
-        
         self.sort_key = "name"
         self.sort_reverse = False
 
-        self.all_manga.sort_manga(self.sort_key) 
-        
-        # catcch Escap key press
-        self.bind("<Escape>",self.exit)
-        
-        self.display_menu()
+        # recover the datas
+        if self.all_manga.recover_data():
+            self.all_manga.sort_manga(self.sort_key) 
+            self.display_menu()
+        else:
+            self.set_geometry(250,100)
+            label = tk.Label(self, text=BACKUP_ERR_MSG)
+            label.pack()
+            button = tk.Button(self,text="exit",command=self.destroy)
+            button.pack(side="bottom")
     
     # resize and position the window
     def set_geometry(self, width:int, height:int,x="",y=""):
