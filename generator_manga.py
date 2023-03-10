@@ -10,11 +10,11 @@ def random_manga(ID:int):
     
     author = ""
     for i in range(2,rd.randrange(10)):
-        name += rd.choice(LETTER)
+        author += rd.choice(LETTER)
     
     type = ""
     for i in range(2,rd.randrange(10)):
-        name += rd.choice(LETTER)
+        type += rd.choice(LETTER)
     
     volume_number = int(rd.randrange(1,100))
     
