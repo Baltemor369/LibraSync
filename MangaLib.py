@@ -7,6 +7,14 @@ from Manga import Manga
 # + volume "1-4"=> du volume 1 au 4
 # + faire alignement affichage statistique
 # + développer module historique(moyenne par semaine/mois voir combien ont été ajout pendant une semaine donnée)
+# + verifier que le dossier data existe (os .path.exists .makedirs)
+
+"""
+faire un executable : in cmd
+- pyinstaller --name=mon_programme --onefile --windowed mon_programme.py
+- pyinstaller mon_programme.spec
+
+"""
 
 FILE_PATH = "data/data.txt"
 class MangaLib:
