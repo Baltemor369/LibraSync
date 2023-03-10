@@ -19,7 +19,11 @@ class Manga:
         return buff
 
     def __eq__(self, __o: object) -> bool:
-        return self.__dict__ == __o.__dict__
+        for key in ["name", "author", "volume_number"]:
+            if self.__dict__[key] != __o.__dict__[key]:
+                return False
+        return True
+        
 
     def change_volume_number(self, new_value:int) -> None:
         self.volume_number = new_value
