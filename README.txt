@@ -6,7 +6,8 @@ There is also a statistics tab that allows you to see some interesting numbers a
 
 To use this program, you just need to download the latest version named 'Manga_LibraryX.X' and then launch 'main.exe' in the 'dist' folder.
 
-To download a folder from GitHub, navigate to your desired repository, select the folder you want to download from GitHub, copy the URL, then paste it at this URL : https://download-directory.github.io/
+To download a folder from GitHub, navigate to your desired repository, select the folder you want to download from GitHub, 
+copy the URL, then paste it at this URL : https://download-directory.github.io/
 
 update note :
 Manga_Library1.0 : First working version
