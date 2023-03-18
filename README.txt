@@ -16,6 +16,7 @@ When you run the program, a window will appear with several categories :
 
 Update note :
 Manga_Library1.1 : "volume number" accepted only number like "6","26",.. now, you can write "1,4-8,15", it's equal to 1,4,5,6,7,8,15 and all these volume will be added to your list.
+Manga_Library1.2 : Display the mangas 10 by 10, otherwise the window expands until it exceeds the screen, making the tool unusable.
 
 Contributing :
 
