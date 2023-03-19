@@ -1,5 +1,5 @@
 
-# Manga Library
+# Manga Library Manager
 
 This is a simple program that helps you manage your manga collection using the Tkinter GUI toolkit. The user can add, delete and update manga features. The program stores manga information in a data file like in a database, which allows you to quickly search and sort your collection, and save your data between each execution.
 ## Authors
