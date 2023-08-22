@@ -1,24 +1,23 @@
 
 # Manga Library Manager
 
-This is a simple program that helps you manage your manga collection using the Tkinter GUI toolkit. The user can add, delete and update manga features. The program stores manga information in a data file like in a database, which allows you to quickly search and sort your collection, and save your data between each execution.
-## Authors
+Welcome to the Manga Library Manager, a user-friendly program designed to assist you in efficiently managing your manga collection through the intuitive Tkinter GUI toolkit. With this program, you can seamlessly add, delete, and update manga details, ensuring your collection remains organized and up-to-date. The application employs a structured data file system akin to a database, facilitating swift searches and convenient sorting of your collection. Furthermore, your data is preserved between each session, ensuring your progress is safeguarded and readily accessible.
 
 - [@Baltemor369](https://www.github.com/Baltemor369)
 
 ## Installation
 
-To use this program, download the latest version named 'Manga_LibraryX.X' and then just launch 'MangaManager.exe'.
-
-To download a specific folder from a GitHub project, navigate to your desired repository, copy the URL(should be like : https://github.com/Author/ProjectName/YourDesiredFolder), then paste it at this URL : https://download-directory.github.io/
-/!\Don't forget to extract the downloaded zip folder before launch the program/!\
+- You need to install [python](https://www.python.org/downloads/) first.
+- Download the folder "MangaManager".
+- open with python the file "main.py".
     
 ## Usage
 
-When you run the program, a window will appear with several categories :
-- My library : A table with all your mangas (name, author, type, volume number, description, valuation, and the date when you add the manga), you can research a manga, modify information if something is wrong and delete a manga.
-- Add manga : A form to add a new manga : name, author, type, description allow alphanumeric charactere only, valuation accept only float between 0 and 10, volume number accept a writing like "1,3,5-8,12" which means "i have volume 1 3 5 6 7 8 and 12" (so all of these have the same specifications).
-- Statistics: Statistical analyses such as means and totals.
+Upon launching the program, a window will emerge, presenting you with a range of distinctive categories:
+
+- **My Library**: A comprehensive table cataloging all your manga entries, encompassing essential details such as the title, author, genre, and volume number. This section provides the versatility to explore and search for specific mangas, rectify erroneous information, and efficiently eliminate entries.
+
+- **Add Manga**: This section offers a streamlined form to seamlessly introduce new manga entries. Essential information, including the title, author, genre, and volume number, can be entered effortlessly. A unique feature is the capacity to input volume numbers using a range-based notation (e.g., "1,3,5-8,12"), indicating ownership of volumes 1, 3, 5 through 8, and 12. This convenient notation simplifies the process of inputting shared specifications for multiple volumes
 
 ## Update note
 
@@ -26,10 +25,15 @@ When you run the program, a window will appear with several categories :
 - __Manga_Library1.2__ : Display the mangas 10 by 10, otherwise the window expands until it exceeds the screen, making the tool unusable.
 - __Manga_Library1.3__ : Fix a issue with search manga, add backup data feature and a icon.
 - __Manga_Library1.4__ : Fix a issue with "modify a manga", design modifications, add a compressor "show more"/"show less" of the Library which able you to only see different manga's names, able to changes pages by scrolling, add more inputs check up.
+- Reorganisation and rebuilding of the project
 
 ## Contributing
 
-Manga icons created by Freepik - Flaticon
+Manga icons created by [Freepik](https://www.flaticon.com/fr/auteurs/Freepik) - Flaticon
 
-If you find a bug or have a suggestion for a new feature, please open an issue on the GitHub repository. Pull requests are also welcome.
+Should you encounter any bugs or wish to propose new features, we encourage you to initiate an issue on our GitHub repository. Additionally, we warmly welcome pull requests from the community.
+
+## License
+
+This project is licensed under the [MIT](https://choosealicense.com/licenses/mit/) License - feel free to use, modify, and distribute it as you see fit.
 
