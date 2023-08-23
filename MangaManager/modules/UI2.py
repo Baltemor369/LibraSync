@@ -17,6 +17,7 @@ class UI(tk.Tk):
         self.bind("<Escape>", self.exit)
 
         self.myLib = Library()
+        self.myLib.load_data()
         self.page_nb = 0
         self.sample_length = 10
 
@@ -24,28 +25,30 @@ class UI(tk.Tk):
     
     def run(self):
         self.mainloop()
+    
+    def titrate(self, text:str):
+        titleFrame = tk.Frame(self, bg=BG)
+        titleFrame.pack(fill="x")
+
+        title = tk.Label(titleFrame, text=f"Library Manager - {text}", **TITLE)
+        title.pack(pady=10)
 
     def main_menu(self):
         use.clear(self)
 
-        title = tk.Label(self, text="My Library Manager", **TITLE)
-        title.pack(pady=10)
+        self.titrate("Menu")
 
         lib_access_B = tk.Button(self, text="Library Access", **BUTTON, command=self.library_menu)
-        lib_access_B.pack(pady=5)
+        lib_access_B.pack(pady=10)
         exit_B = tk.Button(self, text="Exit", **BUTTON, command=self.exit)
-        exit_B.pack(pady=5)
+        exit_B.pack(pady=3)
 
         use.set_geometry(self, marginEW=50, marginNS=50)
     
     def library_menu(self):
         use.clear(self)
 
-        titleFrame = tk.Frame(self, bg=BG)
-        titleFrame.pack(fill="x")
-
-        title = tk.Label(titleFrame, text="My Library Manager", **TITLE)
-        title.pack(pady=10)
+        self.titrate("Tab")
 
         bodyFrame = tk.Frame(self, bg=BG)
         bodyFrame.pack(fill="both", expand=True)
@@ -56,13 +59,13 @@ class UI(tk.Tk):
         topFrame = tk.Frame(navFrame, bg=BG)
         topFrame.pack(pady=5, fill="both")
 
-        add_B = tk.Button(topFrame, text="Add Book", **BUTTON)
+        add_B = tk.Button(topFrame, text="Add Book", **BUTTON, command=self.add_menu)
         add_B.pack(pady=5)
 
         botFrame = tk.Frame(navFrame, bg=BG)
         botFrame.pack(pady=5, fill="x", side="bottom")
 
-        exit_B = tk.Button(botFrame, text="Exit", **BUTTON, command=self.exit)
+        exit_B = tk.Button(botFrame, text="Return", **BUTTON, command=self.main_menu)
         exit_B.pack(pady=5)
 
         divFrame = tk.Frame(bodyFrame, bg=BG)
@@ -97,7 +100,9 @@ class UI(tk.Tk):
     
 
     def display_table(self, root:tk.Tk|tk.Frame|tk.Toplevel):
-        
+        use.clear(root)
+        self.myLib.load_data()
+
         divFrame = tk.Frame(root, bg=BG)
         divFrame.pack(fill="both", expand=True)
 
@@ -120,8 +125,60 @@ class UI(tk.Tk):
                 caseFrame.pack(side="left", fill="both", expand=True)
                 if key != "id":
                     label = tk.Label(caseFrame, text=val, **LABEL)
-                    label.pack(fill="both")        
+                    label.pack(fill="both")
     
+    def add_menu(self):
+        use.clear(self)
+
+        self.titrate("Add")
+
+        bodyFrame = tk.Frame(self, bg=BG)
+        bodyFrame.pack(fill="both", expand=True)
+        
+        divframe = tk.Frame(bodyFrame, bg=BG)
+        divframe.pack(fill="both", expand=True)
+
+        LabelFrame = tk.Frame(divframe, bg=BG)
+        LabelFrame.pack(fill="both", expand=True, side="left")
+        
+        for txt in ["Title :", "Author :", "Type :", "Tome n° :"]:
+            div1frame = tk.Frame(LabelFrame, bg=BG)
+            div1frame.pack(fill="both", pady=8)
+            label = tk.Label(div1frame, text=txt, **LABEL)
+            label.pack(side="right")
+        
+        InputFrame = tk.Frame(divframe, bg=BG)
+        InputFrame.pack(fill="both", expand=True, side="right")
+        
+        for _ in range(4):
+            div2frame = tk.Frame(InputFrame, bg=BG)
+            div2frame.pack(fill="x", expand=True)
+            entry = tk.Entry(div2frame, **ENTRY)
+            entry.pack()
+        
+        footerFrame = tk.Frame(bodyFrame, bg=BG)
+        footerFrame.pack(fill="x", expand=True)
+
+        add_B = tk.Button(footerFrame, text=" Add ", **BUTTON)
+        add_B.pack()
+
+        botFrame = tk.Frame(self, bg=BG)
+        botFrame.pack()
+
+        sub1Frame = tk.Frame(botFrame, bg=BG)
+        sub1Frame.pack(fill="both", expand=True, side="left")
+
+        return_B = tk.Button(sub1Frame, text="Return", **BUTTON, command=self.library_menu)
+        return_B.pack(pady=5)
+
+        sub2Frame = tk.Frame(botFrame, bg=BG)
+        sub2Frame.pack(fill="both", expand=True, side="right")
+
+        exit_B = tk.Button(sub2Frame, text="Exit", **BUTTON, command=self.exit)
+        exit_B.pack(pady=5)
+
+        use.set_geometry(self, marginEW=50, marginNS=50)
+
     def error(self, text:str):
         messagebox.showinfo("Error", text)
 

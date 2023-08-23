@@ -285,6 +285,7 @@ class Library:
         try:    
             self.cursor.execute('''SELECT * FROM books''')
             data = self.cursor.fetchall()
+            self.clear_lib()
             for elt in data:
                 bk = Book(self.get_free_id(), elt[0], elt[2], elt[3], elt[4])
                 self.add_book(bk)
@@ -309,6 +310,7 @@ class Library:
                     (bk.id, bk.title, bk.author, bk.type, bk.tome)
                     )
                 self.connection.commit()
+            self.load_data()
             return True
         except (TypeError,ValueError) as e:
             messagebox.showerror("Error", f"An error occurred : {e}")
@@ -335,4 +337,4 @@ class Library:
         else:
             messagebox.showerror("Error", f"An error occurred : no acceptable data given")
         self.connection.commit()
-        
+        self.load_data()
