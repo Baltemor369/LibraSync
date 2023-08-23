@@ -1,5 +1,4 @@
 from modules.UI2 import UI
-import os
 
 # build executable : 
 # pyinstaller --name MangaManager --noconsole --onefile --path modules main.py

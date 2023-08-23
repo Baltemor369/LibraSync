@@ -15,9 +15,124 @@ LABEL = {
 BUTTON = {
     "bg" : BGLIGHT,
     "fg" : FG,
-    "relief" : "raised"
+    "relief" : "raised",
+    "width" : 10
 }
 ENTRY = {
     "bg" : BGLIGHT,
-    "fg" : FG
+    "fg" : FG,
+    "width" : 30
+}
+CASE = {
+    "borderwidth" : 1, 
+    "relief" : "solid",
+    "width" : 30
+}
+
+PAD5 = {
+    "padx" : 5,
+    "pady" : 5,
+}
+PAD10 = {
+    "padx" : 10,
+    "pady" : 10,
+}
+PAD15 = {
+    "padx" : 15,
+    "pady" : 15,
+}
+
+PAD20 = {
+    "padx": 20,
+    "pady": 20,
+}
+
+PAD25 = {
+    "padx": 25,
+    "pady": 25,
+}
+
+PAD30 = {
+    "padx": 30,
+    "pady": 30,
+}
+
+PADX5Y5 = {
+    "padx": 5,
+    "pady": 5,
+}
+
+PADX5Y10 = {
+    "padx": 5,
+    "pady": 10,
+}
+
+PADX5Y15 = {
+    "padx": 5,
+    "pady": 15,
+}
+
+PADX5Y20 = {
+    "padx": 5,
+    "pady": 20,
+}
+
+PADX10Y5 = {
+    "padx": 10,
+    "pady": 5,
+}
+
+PADX10Y10 = {
+    "padx": 10,
+    "pady": 10,
+}
+
+PADX10Y15 = {
+    "padx": 10,
+    "pady": 15,
+}
+
+PADX10Y20 = {
+    "padx": 10,
+    "pady": 20,
+}
+
+PADX15Y5 = {
+    "padx": 15,
+    "pady": 5,
+}
+
+PADX15Y10 = {
+    "padx": 15,
+    "pady": 10,
+}
+
+PADX15Y15 = {
+    "padx": 15,
+    "pady": 15,
+}
+
+PADX15Y20 = {
+    "padx": 15,
+    "pady": 20,
+}
+
+PADX20Y5 = {
+    "padx": 20,
+    "pady": 5,
+}
+
+PADX20Y10 = {
+    "padx": 20,
+    "pady": 10,
+}
+
+PADX20Y15 = {
+    "padx": 20,
+    "pady": 15,
+}
+
+PADX20Y20 = {
+    "padx": 20,
+    "pady": 20,
 }

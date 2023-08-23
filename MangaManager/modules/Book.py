@@ -1,10 +1,11 @@
 
+
 class Book:
-    def __init__(self, primary_key:int, title="",  author="", type="", volume_nb=0) -> None:
+    def __init__(self, primary_key:int, title="",  author="", type="", tome=0) -> None:
         self.title = title
         self.author = author
         self.type = type
-        self.volume_number = volume_nb
+        self.tome = tome
         self.id = primary_key
 
     def __eq__(self, __o: object) -> bool:
@@ -13,7 +14,7 @@ class Book:
             check = False
         if self.author != __o.author :
             check = False
-        if self.volume_number != __o.volume_number:
+        if self.tome != __o.tome:
             check = False
         return check
     
@@ -28,4 +29,4 @@ class Book:
         if new_type:
             self.type = new_type
         if new_volume!=-1:
-            self.volume_number = new_volume
+            self.tome = new_volume

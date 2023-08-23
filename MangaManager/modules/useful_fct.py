@@ -1,10 +1,12 @@
 import tkinter
 
-def set_geometry(self:tkinter.Tk|tkinter.Toplevel, margin_EW:int=100, margin_NS:int=20, center:bool=True):
+def set_geometry(self:tkinter.Tk|tkinter.Toplevel, width:int=0, height:int=0, marginEW:int=100, marginNS:int=20, center:bool=True):
     """resize and center the window"""
     self.update_idletasks()
-    width = self.winfo_reqwidth() + margin_EW  # margin E-W
-    height = self.winfo_reqheight() + margin_NS  # margin N-S
+    if width == 0:
+        width = self.winfo_reqwidth() + marginEW  # margin Est-West
+    if height == 0:
+        height = self.winfo_reqheight() + marginNS  # margin North-South
 
     x = (self.winfo_screenwidth() // 2) - (width // 2)
     y = (self.winfo_screenheight() // 2) - (height // 2)
@@ -24,18 +26,31 @@ def undisplay(self:tkinter.Tk|tkinter.Frame):
             widget.pack_forget()
         
 
-def popup(self:tkinter.Tk|tkinter.Frame, text:str|dict, title:str="Alert", bg:str="#333333", fg:str="#FFFFFF", font=("Helvetica",20)):
+def popup(self:tkinter.Tk|tkinter.Frame, text:str|list|dict, title:str="Alert", bg:str="#333333", fg:str="#FFFFFF", font=("Helvetica",20), allow_editing:bool=False):
     """
     generate a pop up with a Label
     """
     popup = tkinter.Toplevel(self, bg=bg)
     popup.title(title)
     popup.focus()
+    # key bind to escape quickly the window
     popup.bind("<Return>", lambda e: popup.destroy())
     popup.bind("<Escape>", lambda e: popup.destroy())
+
+    # Alert only
     if str == type(text):
         label = tkinter.Label(popup, text=text, bg=bg, fg=fg, font=font)
         label.pack(pady=10)
+    
+    elif list == type(text):
+        for line in text:
+            rowFrame = tkinter.Frame(popup, bg=bg)
+            rowFrame.pack()
+
+            label = tkinter.Label(rowFrame, text=line, bg=bg, fg=fg, font=font)
+            label.pack()
+    
+    # display more data like a table
     elif dict == type(text):
         Lframe = tkinter.Frame(popup, bg=bg)
         Lframe.pack(side="left", fill="both",expand=True)
@@ -51,18 +66,20 @@ def popup(self:tkinter.Tk|tkinter.Frame, text:str|dict, title:str="Alert", bg:st
 
             frame = tkinter.Frame(Rframe, bg=bg)
             frame.pack(pady=5)
-
-            label = tkinter.Entry(frame, bg="#555555", fg=fg, font=font)
-            label.insert(0, val)
+            if allow_editing:
+                label = tkinter.Entry(frame, bg="#555555", fg=fg, font=font)
+                label.insert(0, val)
+            else:
+                 label = tkinter.Label(frame, text=val, bg="#555555", fg=fg, font=font)
             label.pack()
 
     set_geometry(popup)
 
-
-def adjust_cell_sizes(data:list[list[str]], tab_to_adjust:list[list[tkinter.Label]]):
-    """adjust the size of the cases depending on the text inside"""
-    for row in range(len(data)):
-        for col in range(len(data[row])):
-            cell = tab_to_adjust[row][col]
-            cell.config(width=len(data[row][col]))
-            cell.grid(row=row, column=col)
+# not tested yet
+#def adjust_cell_sizes(data:list[list[str]], tab_to_adjust:list[list[tkinter.Label]]):
+#    """adjust the size of the cases depending on the text inside"""
+#    for row in range(len(data)):
+#        for col in range(len(data[row])):
+#            cell = tab_to_adjust[row][col]
+#            cell.config(width=len(data[row][col]))
+#            cell.grid(row=row, column=col)
