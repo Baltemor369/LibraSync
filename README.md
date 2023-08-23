@@ -10,7 +10,11 @@ Welcome to the Manga Library Manager, a user-friendly program designed to assist
 - You need to install [python](https://www.python.org/downloads/) first.
 - Download the folder "MangaManager".
 - open with python the file "main.py".
-    
+
+Or you can download the folder "Manga_Library1.4", then launch the executable "MangaManager.exe".
+
+__to download a folder on github : go [there](https://download-directory.github.io/).__
+
 ## Usage
 
 Upon launching the program, a window will emerge, presenting you with a range of distinctive categories:
