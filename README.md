@@ -29,7 +29,7 @@ Upon launching the program, a window will emerge, presenting you with a range of
 - __Manga_Library1.2__ : Display the mangas 10 by 10, otherwise the window expands until it exceeds the screen, making the tool unusable.
 - __Manga_Library1.3__ : Fix a issue with search manga, add backup data feature and a icon.
 - __Manga_Library1.4__ : Fix a issue with "modify a manga", design modifications, add a compressor "show more"/"show less" of the Library which able you to only see different manga's names, able to changes pages by scrolling, add more inputs check up.
-- Reorganisation and rebuilding of the project
+- Reorganisation and rebuild the project
 
 ## Contributing
 
