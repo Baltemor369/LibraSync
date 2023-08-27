@@ -28,7 +28,7 @@ def undisplay(self:tkinter.Tk|tkinter.Frame):
 
 def popup(self:tkinter.Tk|tkinter.Frame, text:str|list|dict, title:str="Alert", bg:str="#333333", fg:str="#FFFFFF", font=("Helvetica",20), allow_editing:bool=False):
     """
-    generate a pop up with a Label
+    generate a pop up with a Label, to alert user of evenements or any important information
     """
     popup = tkinter.Toplevel(self, bg=bg)
     popup.title(title)
@@ -75,11 +75,101 @@ def popup(self:tkinter.Tk|tkinter.Frame, text:str|list|dict, title:str="Alert", 
 
     set_geometry(popup)
 
-# not tested yet
-#def adjust_cell_sizes(data:list[list[str]], tab_to_adjust:list[list[tkinter.Label]]):
-#    """adjust the size of the cases depending on the text inside"""
-#    for row in range(len(data)):
-#        for col in range(len(data[row])):
-#            cell = tab_to_adjust[row][col]
-#            cell.config(width=len(data[row][col]))
-#            cell.grid(row=row, column=col)
+
+class PromptWindow:
+    def __init__(self, root:tkinter.Tk, title:str="Window", labelsText:list[str]|tuple[str]=("Text : "), inputsInsert:list[str]|tuple[str]=(), windowConfig:dict={}, labelParam:dict={}, inputParam:dict={}, caseParam:dict={}, buttonParam:dict={}, margin:tuple=(20,20)) -> None:
+        """
+        A class to create a window with labeled inputs.
+        Get the entry values in "self.values".
+        Get the occured errors in "self.errorLog"
+
+        Args:
+            title (str): The title of the window. Defaults to "Window".
+            labelsText (list[str]): List of labels for each input field. Defaults to ["Text : "].
+            inputsInsert (list[str]): List of default insert values for each input field. Defaults to ["Text"].
+            windowConfig (dict): Configuration parameters for the window. Defaults to {}.
+            labelParam (dict): Configuration parameters for the Labels. Defaults to {}.
+            inputParam (dict): Configuration parameters for the Entry fields. Defaults to {}.
+            caseParam (dict): Configuration parameters for the input cases. Defaults to {}.
+            buttonParam (dict): Configuration parameters for the buttons. Defaults to {}.
+            margin (tuple): Margin values for the window. Defaults to (20, 20).
+        """
+        self.window = tkinter.Toplevel(root)
+        self.window.title(title)
+
+        self.window.bind("<Escape>", lambda e: self.window.destroy())
+
+        # data var
+        self.errorLog:dict = {}
+        self._entryList:list = []
+        self.values = []
+
+        try:
+            self.window.configure(**windowConfig)
+        except Exception as e:
+            # unexpected param given
+            self.errorLog["Window Configure"] = e
+
+        try:
+            mainFrame = tkinter.Frame(self.window, bg=windowConfig["bg"])
+        except KeyError:
+            # no "bg" param given
+            mainFrame = tkinter.Frame(self.window)
+        mainFrame.pack(fill="both", expand=True)
+
+        if len(inputsInsert) != len(labelsText) and len(inputsInsert) != 0:
+            # cannot guess which "Insert" corresponds to which "Input".
+            self.errorLog["Input & label"] = "Error : the two string lists have not the same length or ."
+            self.window.destroy()
+        else:
+            for i in range(len(labelsText)):
+                try:
+                    rowFrame = tkinter.Frame(mainFrame, bg=windowConfig["bg"])
+                except KeyError:
+                    rowFrame = tkinter.Frame(mainFrame)
+                rowFrame.pack(fill="x", expand=True)
+
+                LeftcaseFrame = tkinter.Frame(rowFrame, **caseParam)
+                LeftcaseFrame.pack(fill="x", expand=True, side="right")
+
+                label = tkinter.Label(LeftcaseFrame, text=labelsText[i], **labelParam)
+                label.pack(side="left")
+
+                RightcaseFrame = tkinter.Frame(rowFrame, **caseParam)
+                RightcaseFrame.pack(fill="x", expand=True, side="right")
+                
+                self._entryList.append(tkinter.Entry(LeftcaseFrame, **inputParam))
+                if len(inputsInsert)>0:
+                    self._entryList[-1].insert(0,  inputsInsert[i])
+                
+                self._entryList[-1].pack(side="left")
+                self._entryList[-1].bind("<Return>", self.confirm)
+            
+            try:
+                footerFrame = tkinter.Frame(mainFrame, bg=windowConfig["bg"])
+            except KeyError:
+                footerFrame = tkinter.Frame(mainFrame)
+            footerFrame.pack(fill="x", expand=True, anchor="s")
+
+            confirmButton = tkinter.Button(footerFrame, text="Confirm", command=self.confirm, **buttonParam)
+            confirmButton.pack(side="left")
+
+            cancelButton = tkinter.Button(footerFrame, text="Cancel", command=self.window.destroy, **buttonParam)
+            cancelButton.pack(side="right")
+            
+            
+            set_geometry(self.window, marginEW=margin[0],  marginNS=margin[1])
+    
+    def confirm(self, e=None):
+        self.save_values()
+        self.window.destroy()
+
+    def get_errors(self) -> dict:
+        return self.errorLog
+
+    def save_values(self) -> list[str]:
+        self.values= [elt.get() for elt in self._entryList]
+        return self.values
+            
+    def destroy(self):
+        self.window.destroy()
