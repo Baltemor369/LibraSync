@@ -1,11 +1,12 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-import modules.useful_fct as use
 import re, math
+import modules.useful_fct as use
 from modules.Library import Library
 from modules.Book import Book
 from modules.const import *
+from modules.tome_string_to_int import tome_str_to_int
 
 # agencement des frames - voir le paint
 
@@ -17,9 +18,12 @@ class UI(tk.Tk):
         self.configure(bg=BG)
         
         self.bind("<Escape>", self.exit)
+        self.bind("<Delete>", self.delete_item)
+        self.bind("<BackSpace>", self.delete_item)
         self.protocol("WM_DELETE_WINDOW", self.exit)
 
         self.books = Library()
+        self.currentTab = "menu"
         self.limit = 10
         self.maxPage = int(math.ceil(len(self.books.get_all()) / self.limit) - 1)
         self.currentPage = 0
@@ -42,7 +46,7 @@ class UI(tk.Tk):
 
     def main_menu(self):
         use.clear(self)
-
+        self.currentTab = "menu"
         self.titrate("Menu")
 
         lib_access_B = tk.Button(self, text="Library Access", **BUTTON15, command=self.library_menu)
@@ -54,7 +58,7 @@ class UI(tk.Tk):
     
     def library_menu(self):
         use.clear(self)
-
+        self.currentTab = "tab"
         self.titrate("Tab")
 
         bodyFrame = tk.Frame(self, bg=BG)
@@ -94,17 +98,29 @@ class UI(tk.Tk):
         leftDivFrame = tk.Frame(turnPageFrame, bg=BG)
         leftDivFrame.pack(fill="both", expand=True, pady=10, side="left")
 
-        previous_B = tk.Button(leftDivFrame, text="Previous", **BUTTON10)
-        previous_B.pack(side="left")
+        previous_B = tk.Button(leftDivFrame, text="Previous", command=self.previous_page, **BUTTON10)
+        if self.currentPage > 0:
+            previous_B.pack(side="left")
 
         rightDivFrame = tk.Frame(turnPageFrame, bg=BG)
         rightDivFrame.pack(fill="both", expand=True, pady=10, side="right")
         
-        next_B = tk.Button(rightDivFrame, text="Next", **BUTTON10)
-        next_B.pack(side="right")
+        next_B = tk.Button(rightDivFrame, text="Next", command=self.next_page, **BUTTON10)
+        if self.currentPage < self.maxPage:
+            next_B.pack(side="right")
 
         use.set_geometry(self, marginEW=50, marginNS=50)
     
+    def next_page(self, e=None):
+        if self.currentPage < self.maxPage:
+            self.currentPage += 1
+            self.library_menu()
+    
+    def previous_page(self, e=None):
+        if self.currentPage > 0:
+            self.currentPage -= 1
+            self.library_menu()
+        
 
     def display_table(self, root:tk.Tk|tk.Frame|tk.Toplevel):
         use.clear(root)
@@ -113,57 +129,67 @@ class UI(tk.Tk):
         divFrame.pack(fill="both", expand=True)
         
         # Create a treeview with columns
-        tree = ttk.Treeview(divFrame, columns=HEADERS, show="headings")
+        self.tree = ttk.Treeview(divFrame, columns=HEADERS, show="headings")
 
         # Set column headings
-        tree.heading("Title", text="Title", command=lambda: self.tree_sort(tree, "Title"))
-        tree.heading("Author", text="Author", command=lambda: self.tree_sort(tree, "Author"))
-        tree.heading("Type", text="Type", command=lambda: self.tree_sort(tree, "Type"))
-        tree.heading("Tome", text="Tome", command=lambda: self.tree_sort(tree, "Tome"))
+        self.tree.heading("Title", text="Title", command=lambda: self.tree_sort("Title"))
+        self.tree.heading("Author", text="Author", command=lambda: self.tree_sort("Author"))
+        self.tree.heading("Type", text="Type", command=lambda: self.tree_sort("Type"))
+        self.tree.heading("Tome", text="Tome", command=lambda: self.tree_sort("Tome"))
 
         # Set anchor to center for all columns
-        for col in tree["columns"]:
-            tree.column(col, anchor="center")
+        for col in self.tree["columns"]:
+            self.tree.column(col, anchor="center")
 
         # add data to treeview
         for elt in self.books.get_many(self.currentPage * self.limit, self.limit):
             book = (elt[1], elt[2], elt[3], elt[4])
-            tree.insert("",tk.END, values=book)
+            self.tree.insert("",tk.END, values=book)
         
-        tree.bind("<Double-1>", lambda e: self.modify_elt(e, tree))
+        self.tree.bind("<Double-1>", lambda e: self.modify_elt(e))
 
-        tree.pack(fill="both")
+        self.tree.pack(fill="both")
     
-    def modify_elt(self, evt, tree:ttk.Treeview):
-        item = tree.identify("item", evt.x, evt.y)
+    def modify_elt(self, evt):
+        item = self.tree.identify("item", evt.x, evt.y)
         if item:
-            values = tree.item(item, "values")
+            values = self.tree.item(item, "values")
             self.ask = use.PromptWindow(self, f"Modify {values[0]}", ("Title : ", "Author : ", "Type : ", "Tome : "), values)
             self.wait_window(self.ask.window)
             if self.ask.values:
                 for i,val in enumerate(self.ask.values):
                     if not val:
                         self.ask.values[i] = values[i]
-                tree.item(item, values=self.ask.values)
+                self.tree.item(item, values=self.ask.values)
+                self.books.update_book(Book(*values), Book(*self.ask.values))
     
-    def tree_sort(self, tree, col):
+    def tree_sort(self, col:str):
         if col != self.sort_key:
             self.reverse_sort = False
             self.sort_key = col
         else:
             self.reverse_sort = not self.reverse_sort
         
-        data = [(tree.set(child, col), child) for child in tree.get_children("")]
-        data.sort(reverse=self.reverse_sort)
+        data = [(self.tree.set(child, col), child) for child in self.tree.get_children("")]
+        data.sort(reverse=self.reverse_sort,)
         for index, (val, child) in enumerate(data):
-            tree.move(child, "", index)
+            self.tree.move(child, "", index)
     
-    def delete_row(tree, item):
-        tree.delete(item)
+    def delete_item(self, e:tk.Event):
+        if self.currentTab == "tab":
+            items = self.tree.selection()
+            if items:
+                for item in items:
+                    values = self.tree.item(item, "values")
+                    confirmed = messagebox.askyesno("Confirmation",f"Are you sure you want to delete :\nTitle : {values[0]}\nAuthor : {values[1]}\nType : {values[2]}\nTome : {values[3]} ?")
+                    if confirmed:
+                        self.tree.delete(item)
+                        self.books.delete_book([Book(*values)])
+                self.library_menu()
 
     def add_menu(self):
         use.clear(self)
-
+        self.currentTab = "add"
         self.titrate("Add")
 
         bodyFrame = tk.Frame(self, bg=BG)
@@ -221,21 +247,24 @@ class UI(tk.Tk):
         values = []
         for elt in self.list_entry:
             values.append(elt.get())
-        if re.match("^[a-zA-Z0-9 ']+$", values[0]) is not None:
+        if re.match("^[a-zA-Z0-9 ']+$", values[0]):
             title = values[0]
-            if re.match("^[a-zA-Z0-9 ']+$", values[1]) is not None:
+            if re.match("^[a-zA-Z0-9 ']+$", values[1]):
                 author = values[1]
-                if re.match("^[a-zA-Z/ ]+$", values[2]) is not None:
+                if re.match("^[a-zA-Z/ ]+$", values[2]):
                     type = values[2]
-                    if re.match("^[0-9]+$", values[3]) is not None:
-                        tome = values[3]
-                        
-                        ## MODIFICATION HERE ##
-                        if self.books.add_books([Book(title, author, type, tome)]):
-                            self.alert("Books added successfully")
-                            self.library_menu()
-                        else:
-                            self.alert("Book already registered.")
+                    if re.match("^[0-9,-]+$", values[3]):
+                        tome = tome_str_to_int(values[3])
+                        book_added = 0
+                        for ind in tome:
+                            # saved in database
+                            if self.books.add_books([Book(title, author, type, ind)]):
+                                book_added += 1
+                            else:
+                                self.alert(f"Error with the book {title} from {author} tome {ind}.")
+                        self.maxPage = int(math.ceil(len(self.books.get_all()) / self.limit) - 1)
+                        self.alert(f"{book_added} books added successfully")
+                        self.library_menu()
                     else:
                         self.alert("Incorrect Tome value.")
                 else:

@@ -3,10 +3,12 @@ from modules.UI2 import UI
 # build : auto-py-to-exe
 
 # TODO:
-# + sort tab
-# - delete elt + confirm 
-# + modify elt doubleclick
 # - add case's border in tree
+# - add research function
+
+
+# ISSUES TRACK:
+# - tome sort => maybe add a key to sort function : sort(key=XXX)
 
 ui = UI()
 ui.run()

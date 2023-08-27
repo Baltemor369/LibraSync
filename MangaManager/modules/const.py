@@ -2,7 +2,7 @@ BG = "#333333"
 BGLIGHT = "#555555"
 FG = "#FFFFFF"
 HEADERS = ["Title", "Author", "Type", "Tome"]
-
+PATTERNTOME = "^(?:\d+(?:-(?!\d{2}\b)\d+)?,)*(?:\d+(?:-(?!\d{2}\b)\d+)?)$"
 TITLE = {
     "font": ("Helvetica", 20),
     "fg" : FG,

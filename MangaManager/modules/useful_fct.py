@@ -92,7 +92,7 @@ class PromptWindow:
             inputParam (dict): Configuration parameters for the Entry fields. Defaults to {}.
             caseParam (dict): Configuration parameters for the input cases. Defaults to {}.
             buttonParam (dict): Configuration parameters for the buttons. Defaults to {}.
-            margin (tuple): Margin values for the window. Defaults to (20, 20).
+            margin (tuple): Margin values for the window (vertical, horizontal). Defaults to (20, 20).
         """
         self.window = tkinter.Toplevel(root)
         self.window.title(title)
@@ -115,8 +115,10 @@ class PromptWindow:
         except KeyError:
             # no "bg" param given
             mainFrame = tkinter.Frame(self.window)
-        mainFrame.pack(fill="both", expand=True)
+        mainFrame.pack(fill="both", expand=True, pady=margin[0], padx=margin[1])
 
+        tabFrame = tkinter.Frame(mainFrame)
+        tabFrame.pack(fill="both", expand=True)
         if len(inputsInsert) != len(labelsText) and len(inputsInsert) != 0:
             # cannot guess which "Insert" corresponds to which "Input".
             self.errorLog["Input & label"] = "Error : the two string lists have not the same length or ."
@@ -149,7 +151,7 @@ class PromptWindow:
                 footerFrame = tkinter.Frame(mainFrame, bg=windowConfig["bg"])
             except KeyError:
                 footerFrame = tkinter.Frame(mainFrame)
-            footerFrame.pack(fill="x", expand=True, anchor="s")
+            footerFrame.pack(fill="x", expand=True, anchor="s", pady=5)
 
             confirmButton = tkinter.Button(footerFrame, text="Confirm", command=self.confirm, **buttonParam)
             confirmButton.pack(side="left")
@@ -158,7 +160,7 @@ class PromptWindow:
             cancelButton.pack(side="right")
             
             
-            set_geometry(self.window, marginEW=margin[0],  marginNS=margin[1])
+            set_geometry(self.window, marginNS=margin[0],  marginEW=margin[1])
     
     def confirm(self, e=None):
         self.save_values()
