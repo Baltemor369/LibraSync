@@ -4,11 +4,11 @@ from modules.UI2 import UI
 
 # TODO:
 # - add case's border in tree
-# - add research function
-
+# - add research feature
+# - ? sortir le add menu dans une autre fenetre (PromptWindow?)
 
 # ISSUES TRACK:
-# - tome sort => maybe add a key to sort function : sort(key=XXX)
+# -
 
 ui = UI()
 ui.run()

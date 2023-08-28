@@ -1,14 +1,14 @@
+#public lib import
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 import re, math
+#personnal lib improt
 import modules.useful_fct as use
 from modules.Library import Library
 from modules.Book import Book
 from modules.const import *
 from modules.tome_string_to_int import tome_str_to_int
-
-# agencement des frames - voir le paint
 
 class UI(tk.Tk):
     def __init__(self) -> None:
@@ -27,9 +27,7 @@ class UI(tk.Tk):
         self.limit = 10
         self.maxPage = int(math.ceil(len(self.books.get_all()) / self.limit) - 1)
         self.currentPage = 0
-        self.reverse_sort = False
-        self.sort_key = ""
-
+        
         self.ask = None
 
         self.main_menu()
@@ -84,7 +82,7 @@ class UI(tk.Tk):
 
         search_bar_E = tk.Entry(divFrame, **ENTRY, width=60)
         search_bar_E.insert(0, "Search a book")
-        search_bar_E.bind("<FocusIn>", lambda e: e.widget.delete(0, "end") if e.widget.get()=="Search a book" else self.nothing())
+        search_bar_E.bind("<FocusIn>", lambda e: e.widget.delete(0, "end") if e.widget.get()=="Search a book" else self.do_nothing())
         search_bar_E.pack()
         
         tableFrame = tk.Frame(divFrame, bg=BGLIGHT)
@@ -164,16 +162,12 @@ class UI(tk.Tk):
                 self.books.update_book(Book(*values), Book(*self.ask.values))
     
     def tree_sort(self, col:str):
-        if col != self.sort_key:
-            self.reverse_sort = False
-            self.sort_key = col
+        if col.lower() != self.books.get_key_sort().lower():
+            self.books.reverse = False
         else:
-            self.reverse_sort = not self.reverse_sort
-        
-        data = [(self.tree.set(child, col), child) for child in self.tree.get_children("")]
-        data.sort(reverse=self.reverse_sort,)
-        for index, (val, child) in enumerate(data):
-            self.tree.move(child, "", index)
+            self.books.reverse = not self.books.reverse 
+        self.books.change_sort_order(col.lower())
+        self.library_menu()
     
     def delete_item(self, e:tk.Event):
         if self.currentTab == "tab":
@@ -284,8 +278,8 @@ class UI(tk.Tk):
             pass
         except tk.TclError:
             pass
-
+        self.books.close()
         self.destroy()
     
-    def nothing(self):
+    def do_nothing(self):
         pass
