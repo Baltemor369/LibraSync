@@ -1,5 +1,7 @@
 from modules.Book import Book
 from modules.const import KEYORDER
+from modules.search_str_to_dict import search_str_to_dict
+import re
 import sqlite3 as sql
 
 class Library:
@@ -21,78 +23,60 @@ class Library:
         self.reverse = False
 
     def get_all(self):
-        """
-        Retrieve all records from the database based on a provided SQL query and parameters.
+        query = self.cursor.execute("SELECT * FROM books")
+        return query.fetchall()
 
-        Args:
-            cmd (str): The additional SQL query to be appended (e.g., "WHERE title=?").
-            param (tuple): The parameters to be used in the SQL query.
-
-        Returns:
-            list: A list of fetched records.
-        """
+    def get(self, start:int, limit:int, text:str=""):
+        # param check in
         try:
-            key = ", ".join(self.key_priority)
-            reverse = "DESC" if self.reverse else ""
-            query = self.cursor.execute(f"SELECT * FROM books ORDER BY {key} {reverse}")
-            return query.fetchall()
-        except Exception:
-            return []
-    
-    def get_many(self, start:int, limit:int):
-        if self.reverse:
-            reverse = " DESC" 
-        else:
-            reverse = ""
-        self.key_priority[0] += reverse
-        key = ", ".join(self.key_priority)
-        request = f"SELECT * FROM books  ORDER BY {key}  LIMIT ? OFFSET ?"
-        query = self.cursor.execute(request,(limit, start))
-        return query.fetchall()
-    
-    def get_by_title(self, title:str):
-        reverse = " DESC" if self.reverse else ""
-        self.key_priority[0] += reverse
-        key = ", ".join(self.key_priority)
-        query = self.cursor.execute("SELECT * FROM books WHERE title=? ORDER BY ?",(title,key))
-        return query.fetchall()
-    
-    def get_by_author(self, author:str):
-        reverse = " DESC" if self.reverse else ""
-        self.key_priority[0] += reverse
-        key = ", ".join(self.key_priority)
-        query = self.cursor.execute("SELECT * FROM books WHERE author=? ORDER BY ?",(author,key))
-        return query.fetchall()
-    
-    def get_by_type(self, type:str):
-        reverse = " DESC" if self.reverse else ""
-        self.key_priority[0] += reverse
-        key = ", ".join(self.key_priority)
-        query = self.cursor.execute("SELECT * FROM books WHERE type=? ORDER BY ?",(type,key))
-        return query.fetchall()
-    
-    def get_by_id(self, id:str):
-        query = self.cursor.execute("SELECT * FROM books WHERE id=?",(id,))
-        return query.fetchall()
+            start = int(start)
+            limit = int(limit)
+        except ValueError:
+            return []    
+        
+        request = "SELECT * FROM books"
 
-    def get_elt(self, book:Book):
-        query = self.cursor.execute("SELECT * FROM books WHERE title=? AND author=? AND type=? AND tome=?", (book.title, book.author, book.type, book.tome))
-        return query.fetchone()
+        reverse = " DESC" if self.reverse else ""
+        self.key_priority[0] += reverse
+        key_tmp = ", ".join(self.key_priority)
+
+        # WHERE
+        if re.match("^[\w;: ]*$", text):
+            buff = search_str_to_dict(text)
+            if buff:
+                request += " WHERE "
+                i = 0
+                for key,val in buff.items():
+                    request += f"{key} LIKE '{val}%' "
+                    if i < len(buff)-1:
+                        request += "AND "
+                    i += 1
+
+        # ORDER BY
+        request += " ORDER BY " + key_tmp
+
+        # LIMIT OFFSET
+        request += "  LIMIT " + str(limit) + " OFFSET " + str(start)
+        query = self.cursor.execute(request)
+        return query.fetchall()
     
     def get_key_sort(self):
         return self.key_priority[0]
 
     def is_in(self, book:Book) -> bool:
-        """ verify if the given book is in the list """
         query = self.cursor.execute("SELECT * FROM books WHERE title=? AND author=? AND type=? AND tome=?", (book.title, book.author, book.type, book.tome))
         return query.fetchall() != []
 
-    def change_sort_order(self, key:str):
+    def set_sort_order(self, key:str):
         if key in KEYORDER:
             # put the key in the first position and keep the original order of other key
             self.key_priority = KEYORDER.copy()
             self.key_priority.remove(key)
             self.key_priority.insert(0, key)
+
+    def set_reverse(self, val:bool):
+        if val==True or val==False:
+            self.reverse = val
     
     def add_books(self, data: list[Book]) -> bool:
         """

@@ -27,7 +27,7 @@ class UI(tk.Tk):
         self.limit = 10
         self.maxPage = int(math.ceil(len(self.books.get_all()) / self.limit) - 1)
         self.currentPage = 0
-        
+        self.search_input = tk.StringVar()
         self.ask = None
 
         self.main_menu()
@@ -59,6 +59,8 @@ class UI(tk.Tk):
         self.currentTab = "tab"
         self.titrate("Tab")
 
+        self.currentPage = 0
+
         bodyFrame = tk.Frame(self, bg=BG)
         bodyFrame.pack(fill="both", expand=True)
 
@@ -80,15 +82,17 @@ class UI(tk.Tk):
         divFrame = tk.Frame(bodyFrame, bg=BG)
         divFrame.pack(fill="both", expand=True, side="right", **PAD15)
 
-        search_bar_E = tk.Entry(divFrame, **ENTRY, width=60)
-        search_bar_E.insert(0, "Search a book")
-        search_bar_E.bind("<FocusIn>", lambda e: e.widget.delete(0, "end") if e.widget.get()=="Search a book" else self.do_nothing())
-        search_bar_E.pack()
-        
-        tableFrame = tk.Frame(divFrame, bg=BGLIGHT)
-        tableFrame.pack(fill="both", expand=True, pady=5)
+        self.search_bar_E = tk.Entry(divFrame, **ENTRY, width=60, textvariable=self.search_input)
+        self.search_bar_E.insert(0, "?Search a book?")
+        self.search_bar_E.bind("<FocusIn>", lambda e: e.widget.delete(0, "end") if e.widget.get()=="?Search a book?" else self.do_nothing())
+        self.search_bar_E.pack()
 
-        self.display_table(tableFrame)
+        self.search_input.trace_add("write", self.search_update)
+        
+        self.tableFrame = tk.Frame(divFrame, bg=BGLIGHT)
+        self.tableFrame.pack(fill="both", expand=True, pady=5)
+
+        self.display_table(self.tableFrame)
         
         turnPageFrame = tk.Frame(divFrame, bg=BG)
         turnPageFrame.pack(fill="x", pady=10)
@@ -108,6 +112,10 @@ class UI(tk.Tk):
             next_B.pack(side="right")
 
         use.set_geometry(self, marginEW=50, marginNS=50)
+    
+    def search_update(self,*args):
+        self.search_input.set(self.search_bar_E.get())
+        self.display_table(self.tableFrame)
     
     def next_page(self, e=None):
         if self.currentPage < self.maxPage:
@@ -140,7 +148,7 @@ class UI(tk.Tk):
             self.tree.column(col, anchor="center")
 
         # add data to treeview
-        for elt in self.books.get_many(self.currentPage * self.limit, self.limit):
+        for elt in self.books.get(self.currentPage * self.limit, self.limit, self.search_input.get()):
             book = (elt[1], elt[2], elt[3], elt[4])
             self.tree.insert("",tk.END, values=book)
         
@@ -163,10 +171,10 @@ class UI(tk.Tk):
     
     def tree_sort(self, col:str):
         if col.lower() != self.books.get_key_sort().lower():
-            self.books.reverse = False
+            self.books.set_reverse(False)
         else:
-            self.books.reverse = not self.books.reverse 
-        self.books.change_sort_order(col.lower())
+            self.books.set_reverse(not self.books.reverse )
+        self.books.set_sort_order(col.lower())
         self.library_menu()
     
     def delete_item(self, e:tk.Event):
