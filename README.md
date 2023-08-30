@@ -1,19 +1,23 @@
 
 # Manga Library Manager
 
-Welcome to the Manga Library Manager, a user-friendly program designed to assist you in efficiently managing your manga collection through the intuitive Tkinter GUI toolkit. With this program, you can seamlessly add, delete, and update manga details, ensuring your collection remains organized and up-to-date. The application employs a structured data file system akin to a database, facilitating swift searches and convenient sorting of your collection. Furthermore, your data is preserved between each session, ensuring your progress is safeguarded and readily accessible.
+Welcome to the Manga Manager, a user-friendly program designed to assist you in efficiently managing your manga collection through the intuitive Tkinter GUI toolkit. With this program, you can seamlessly add, delete, and update manga details, ensuring your collection remains organized and up-to-date. The application employs a structured data file system akin to a database, facilitating swift searches and convenient sorting of your collection. Furthermore, your data is preserved between each session, ensuring your progress is safeguarded and readily accessible.
 
 - [@Baltemor369](https://www.github.com/Baltemor369)
 
 ## Installation
+You have this 2 options to download:
 
-- You need to install [python](https://www.python.org/downloads/) first.
-- Download the folder "MangaManager" (currently in development).
-- open with python the file "main.py".
-
-Or you can download the folder "Manga_Library1.4"(no longer be improved), then launch the executable "MangaManager.exe".
-
-__to download a folder on github : go [there](https://download-directory.github.io/).__
+- The .exe version that requires no additional installation.
+    - Download the .zip folder.
+    - Extract the folder.
+    - You need to locate the 'Manga_Manager2.0.exe' file within the 'Manga_Manager2.0' folder.
+    - Simply run it.
+    *I advise you to create a shortcut in a more accessible location on your computer.*
+- The current working directory in which I upload the modifications made to the program:
+    - Download the 'MangaManager' folder via this [website](https://download-directory.github.io/).
+    - If you don't have it, install [Python](https://www.python.org/downloads/).
+    - Open the project in your code editor to make your modifications, or execute the 'main.py' file using Python.
 
 ## Usage
 
