@@ -77,13 +77,14 @@ def popup(self:tkinter.Tk|tkinter.Frame, text:str|list|dict, title:str="Alert", 
 
 
 class PromptWindow:
-    def __init__(self, root:tkinter.Tk, title:str="Window", labelsText:list[str]|tuple[str]=("Text : "), inputsInsert:list[str]|tuple[str]=(), windowConfig:dict={}, labelParam:dict={}, inputParam:dict={}, caseParam:dict={}, buttonParam:dict={}, margin:tuple=(20,20)) -> None:
+    def __init__(self, root:tkinter.Tk, title:str="Window", labelsText:list[str]=["Text : "], inputsInsert:list[str]=[], windowConfig:dict={}, labelParam:dict={}, inputParam:dict={}, caseParam:dict={}, buttonParam:dict={}, margin:tuple=(20,20)) -> None:
         """
         A class to create a window with labeled inputs.
         Get the entry values in "self.values".
         Get the occured errors in "self.errorLog"
 
         Args:
+            root (tkinter.Tk) : the parent window.
             title (str): The title of the window. Defaults to "Window".
             labelsText (list[str]): List of labels for each input field. Defaults to ["Text : "].
             inputsInsert (list[str]): List of default insert values for each input field. Defaults to ["Text"].
@@ -132,19 +133,19 @@ class PromptWindow:
                 rowFrame.pack(fill="x", expand=True)
 
                 LeftcaseFrame = tkinter.Frame(rowFrame, **caseParam)
-                LeftcaseFrame.pack(fill="x", expand=True, side="right")
+                LeftcaseFrame.pack(fill="x", expand=True, side="left")
 
                 label = tkinter.Label(LeftcaseFrame, text=labelsText[i], **labelParam)
-                label.pack(side="left")
+                label.pack()
 
                 RightcaseFrame = tkinter.Frame(rowFrame, **caseParam)
                 RightcaseFrame.pack(fill="x", expand=True, side="right")
                 
-                self._entryList.append(tkinter.Entry(LeftcaseFrame, **inputParam))
+                self._entryList.append(tkinter.Entry(RightcaseFrame, **inputParam))
                 if len(inputsInsert)>0:
                     self._entryList[-1].insert(0,  inputsInsert[i])
                 
-                self._entryList[-1].pack(side="left")
+                self._entryList[-1].pack()
                 self._entryList[-1].bind("<Return>", self.confirm)
             
             try:
@@ -168,10 +169,12 @@ class PromptWindow:
 
     def get_errors(self) -> dict:
         return self.errorLog
-
-    def save_values(self) -> list[str]:
-        self.values= [elt.get() for elt in self._entryList]
+    
+    def get_values(self) -> list[str]:
         return self.values
+
+    def save_values(self):
+        self.values= [elt.get() for elt in self._entryList]
             
     def destroy(self):
         self.window.destroy()

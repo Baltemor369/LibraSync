@@ -3,7 +3,7 @@ BGLIGHT = "#555555"
 FG = "#FFFFFF"
 HEADERS = ["Title", "Author", "Type", "Tome"]
 PATTERNTOME = "^(?:\d+(?:-(?!\d{2}\b)\d+)?,)*(?:\d+(?:-(?!\d{2}\b)\d+)?)$"
-KEYORDER = ["title","author","type","tome"]
+KEYFILTER = ["title: ","author: ","type: ","tome: "]
 
 TITLE = {
     "font": ("Helvetica", 20),

@@ -3,10 +3,10 @@ import re
 def search_str_to_dict(text:str):
     result = {}
     patterns = {
-        "title": r"(?:[\w :;]+;)?title:([\w ]+)(?:;[\w ]+)?",
-        "author": r"(?:[\w :;]+;)?author:([\w ]+)(?:;[\w ]+)?",
-        "type": r"(?:[\w :;]+;)?type:([\w ]+)(?:;[\w ]+)?",
-        "tome": r"(?:[\w :;]+;)?tome:([\d ]+)(?:;[\w ]+)?"
+        "title": r"(?:[\w :;]+;)?title ?: ?([\w ]+)(?:;[\w ]+)?",
+        "author": r"(?:[\w :;]+;)?author ?: ?([\w ]+)(?:;[\w ]+)?",
+        "type": r"(?:[\w :;]+;)?type ?: ?([\w ]+)(?:;[\w ]+)?",
+        "tome": r"(?:[\w :;]+;)?tome ?: ?([\d ]+)(?:;[\w ]+)?"
     }
     
     for key,val in patterns.items():

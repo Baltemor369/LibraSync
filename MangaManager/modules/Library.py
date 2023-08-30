@@ -1,5 +1,5 @@
 from modules.Book import Book
-from modules.const import KEYORDER
+from modules.const import HEADERS
 from modules.search_str_to_dict import search_str_to_dict
 import re
 import sqlite3 as sql
@@ -19,7 +19,9 @@ class Library:
                 ''')
         self.connection.commit()
 
-        self.key_priority = KEYORDER
+        self.key_priority = HEADERS.copy()
+        for elt in self.key_priority:
+            elt = elt.lower()
         self.reverse = False
 
     def get_all(self):
@@ -68,11 +70,14 @@ class Library:
         return query.fetchall() != []
 
     def set_sort_order(self, key:str):
-        if key in KEYORDER:
+        if key in HEADERS:
             # put the key in the first position and keep the original order of other key
-            self.key_priority = KEYORDER.copy()
+            self.key_priority = HEADERS.copy()
             self.key_priority.remove(key)
             self.key_priority.insert(0, key)
+            
+            for elt in self.key_priority:
+                elt = elt.lower()
 
     def set_reverse(self, val:bool):
         if val==True or val==False:

@@ -82,12 +82,23 @@ class UI(tk.Tk):
         divFrame = tk.Frame(bodyFrame, bg=BG)
         divFrame.pack(fill="both", expand=True, side="right", **PAD15)
 
-        self.search_bar_E = tk.Entry(divFrame, **ENTRY, width=60, textvariable=self.search_input)
+        searchFrame = tk.Frame(divFrame, bg=BG)
+        searchFrame.pack(fill="x", expand=True)
+        
+        subFrame = tk.Frame(searchFrame, bg=BG)
+        subFrame.pack(side="left", fill="x", expand=True)
+
+        self.search_bar_E = tk.Entry(subFrame, **ENTRY, width=100, textvariable=self.search_input)
         self.search_bar_E.insert(0, "?Search a book?")
         self.search_bar_E.bind("<FocusIn>", lambda e: e.widget.delete(0, "end") if e.widget.get()=="?Search a book?" else self.do_nothing())
-        self.search_bar_E.pack()
-
+        self.search_bar_E.pack(anchor="center")
         self.search_input.trace_add("write", self.search_update)
+
+        sub1Frame = tk.Frame(searchFrame, bg=BG)
+        sub1Frame.pack(side="right")
+
+        filter_B = tk.Button(sub1Frame, text="Filter", **BUTTON10, command=self.filter_window)
+        filter_B.pack(side="left")
         
         self.tableFrame = tk.Frame(divFrame, bg=BGLIGHT)
         self.tableFrame.pack(fill="both", expand=True, pady=5)
@@ -113,7 +124,21 @@ class UI(tk.Tk):
 
         use.set_geometry(self, marginEW=50, marginNS=50)
     
-    def search_update(self,*args):
+    def filter_window(self):
+        popup = use.PromptWindow(self, "Filter", labelsText=KEYFILTER, labelParam={"padx":10})
+        self.wait_window(popup.window)
+        if popup.get_values():
+            values = popup.get_values()
+            text = ""
+            for i,val in enumerate(values):
+                if val:
+                    text += KEYFILTER[i]
+                    text += val + ";"
+            self.search_bar_E.delete(0,"end")
+            self.search_bar_E.insert(0, text)
+            self.display_table(self.tableFrame)
+        
+    def search_update(self, *args):
         self.search_input.set(self.search_bar_E.get())
         self.display_table(self.tableFrame)
     
