@@ -2,8 +2,10 @@ BG = "#333333"
 BGLIGHT = "#555555"
 FG = "#FFFFFF"
 HEADERS = ["Title", "Author", "Type", "Tome"]
-PATTERNTOME = "^(?:\d+(?:-(?!\d{2}\b)\d+)?,)*(?:\d+(?:-(?!\d{2}\b)\d+)?)$"
+HEADERSLOWERCASE = ["title", "author", "type", "tome"]
 KEYFILTER = ["title: ","author: ","type: ","tome: "]
+PATTERNTOME = r"^(?:\d+(?:-(?!\d{2}\b)\d+)?,)*(?:\d+(?:-(?!\d{2}\b)\d+)?)$"
+
 
 TITLE = {
     "font": ("Helvetica", 20),
@@ -30,6 +32,11 @@ BUTTON15 = {
 ENTRY = {
     "bg" : BGLIGHT,
     "fg" : FG,
+}
+SPECENTRY = {
+    "borderwidth" : 0,
+    "width" : 3,
+    "relief" : "flat",
 }
 CASE = {
     "borderwidth" : 1, 
