@@ -29,7 +29,7 @@ You have this 2 options to download:
 - **Editing** : You can edit a book's information by double-clicking on its row, a window with book's information appear, do your changes.
 - **Deleting** : delete a selection of manga by pressing 'Delete' or 'Backspace', A confirmation window appears to verify the action and prevent unintended deletions.
 - **Sort** :  sort your table by clicking on a header, you can also reverse the sort by clicking again on the same header.
-- **Add Book**: A window appears when you click on "Add Book," which will prompt you to enter a title, an author, a book genre, and a volume count (similar to Harry Potter Volume 2, for instance). This last parameter accepts a more convenient format for adding a large number of books at once (for example, "1-5,7-9,15,20" will be translated as "added volumes 1 to 5, 7 to 9, 15, and 20").
+- **Add Book**: A window appears when you click on "Add Book," which will prompt you to enter a title, an author, a book genre, and a volume count (similar to Harry Potter _Volume 2_, for instance). This last parameter accepts a more convenient format for adding a large number of books at once (for example, "1-5,7-9,15,20" will be translated as "added volumes 1 to 5, 7 to 9, 15, and 20").
 ## Contributing
 
 Application logo created by [Roundicons](https://www.flaticon.com/fr/auteurs/roundicons) - Flaticon
