@@ -19,7 +19,7 @@ You have this 2 options to download:
     - Simply run it.
     *I advise you to create a shortcut in a more accessible location on your computer.*
 - The current working directory in which I upload the modifications made to the program:
-    - Download the 'MangaManager' folder via this [website](https://download-directory.github.io/).
+    - Download the 'MangaManager' folder.
     - If you don't have it, install [Python](https://www.python.org/downloads/).
     - Open the project in your code editor to make your modifications, or execute the 'main.py' file using Python.
 ## Usage
