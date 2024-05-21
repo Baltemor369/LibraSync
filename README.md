@@ -1,6 +1,6 @@
 ## LibraSync
 
-Book manager for libraries.
+A easy use Manager for your books collection.
 
 ## Features
 
