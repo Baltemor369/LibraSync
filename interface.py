@@ -1,4 +1,5 @@
 import tkinter as tk
+import uuid
 from tkinter import ttk
 from tkTools import clear, popup
 from library import Library,Book
@@ -29,6 +30,7 @@ class Interface():
         self.data = Library()
         self.data.loadFile("save.txt")
         self.searchConditions = {}
+        self.references = []
         self.page:int = 1
         self.nbLine = 10
         self.mainMenu()
@@ -170,10 +172,10 @@ class Interface():
         inputs = {
             "name":self.widgets["name"].get(),
             "author":self.widgets["author"].get(),
-            "read":self.widgets["read"].get().lower() in ["true","yes"],
+            "read":self.widgets["read"].get().lower() in ["true","yes","y"],
             "families": [elt.get() for elt in self.widgets["family"]]
         }
-        self.data.addBook(Book("ref", inputs["name"], inputs["author"], inputs["read"], inputs["families"]))
+        self.data.addBook(Book(self.refGenerator(), inputs["name"], inputs["author"], inputs["read"], inputs["families"]))
         self.mainMenu()
     
     def deleteBook(self):
@@ -251,7 +253,7 @@ class Interface():
             self.mainMenu()
     
     def refGenerator(self):
-        pass
+        return str(uuid.uuid4())
 
     def clear_entry(self, event):
         if event.widget.get() in ["Name", "Author", "Read", "Family"]:
@@ -286,9 +288,9 @@ class Interface():
     def treeview(self):
         clear(self.treeFrame)
 
-        self.tree = ttk.Treeview(self.treeFrame, columns=("Ref","Name","Author","Family","Status"), show='headings')
+        self.tree = ttk.Treeview(self.treeFrame, columns=("Ref","Name","Author","Family","Read"), show='headings')
 
-        for col in ("Ref", "Name", "Author", "Family", "Status"):
+        for col in ("Ref", "Name", "Author", "Family", "Read"):
             self.tree.heading(col, text=col, command=lambda c=col: self.sort_column(self.tree, c, False))
         
         for elt in self.data.select(((self.page-1)*self.nbLine), self.nbLine, where=self.searchConditions):
