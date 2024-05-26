@@ -26,6 +26,6 @@ A easy use Manager for your books collection.
 
 [] upgrade DB management (SQLite or other)
 
-[] make settings menu
-    [] dark/day mode
-    [] nb books dispkay at the same time (5-50)
+[] dark/day mode
+
+[] nb books dispkay at the same time (5-50)
