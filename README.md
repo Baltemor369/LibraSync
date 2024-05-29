@@ -30,6 +30,10 @@ A easy use Manager for your books collection.
 
 [x] upgrade DB management (SQLite or other)
 
-[] dark/day mode
+[x] dark/day mode
+
+[] update all widgets to apply the new color
+
+[] select more esthetic colors
 
 [] nb books dispkay at the same time (5-50)
