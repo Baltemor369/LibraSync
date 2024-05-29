@@ -16,13 +16,13 @@ A easy use Manager for your books collection.
 
 - settings menu
 
+- save your data in a file
+
 ## Todo
 
-[] add Tome category in the tab
+[x] add Tome category in the tab
 
-[] add Tome iput in the add book form
-
-[] add multiple books with Tome
+[x] add Tome input in the add book form
 
 [] upgrade DB management (SQLite or other)
 

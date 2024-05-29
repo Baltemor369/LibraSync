@@ -1,6 +1,5 @@
 from src.book import Book
-import json
-import csv
+import sqlite3
 
 class Library:
     def __init__(self, data:list[Book]=[]) -> None:
@@ -15,7 +14,7 @@ class Library:
     def addBook(self, book:Book)->bool:
         if not self.isIn(book):
             self.list_books.append(book)
-            return True
+            return True 
         return False
     
     def removeBook(self, ref:str):
@@ -52,49 +51,46 @@ class Library:
             if count == 0:
                 break
         return selection
-
-    def saveFile(self, db:list[Book], file_name:str):
-        try:
-            with open(file_name, 'w') as file:
-                for book in db:
-                    families = [elt for elt in book.family]
-                    file.write(f"${book.ref}-{book.name}-{book.author}-{book.read_status}-{families}\n")
-            return True
-        except:
-            return False
-
-    def loadFile(self, file_name:str):
-        db:list[Book] = []
-        try:
-            with open(file_name, 'r') as file:
-                for line in file:
-                    if line[0]=="$":
-                        book = line[1:-1]
-                        bookArgs = book.split("-")
-                        bookArgs[-2] = bookArgs[-2].lower() == "True"
-                        bookArgs[-1] = eval(bookArgs[-1])
-                        db.append(Book(*bookArgs))
-            self.list_books = db.copy()
-            return True
-        except:
-            return False
     
-    def export_to_csv(self, tree, filename):
-        with open(filename, 'w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(tree["columns"])
-            for child in tree.get_children(""):
-                writer.writerow(tree.item(child, "values"))
+    def save_to_db(self, db_name: str):
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+        for book in self.list_books:
+            cursor.execute('SELECT COUNT(*) FROM books WHERE ref = ?', (book.ref,))
+            count = cursor.fetchone()[0]
+            if count==0:
+                cursor.execute('''
+                    INSERT INTO books (ref, name, author, tome, read_status, family)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                ''', (book.ref, book.name, book.author, book.tome, book.read_status, ','.join(book.family)))
+        conn.commit()
+        conn.close()
 
-    def export_to_json(tree, filename):
-        data = []
-        for child in tree.get_children(""):
-            values = tree.item(child, "values")
-            item = {col: value for col, value in zip(tree["columns"], values)}
-            data.append(item)
-        
-        with open(filename, 'w') as file:
-            json.dump(data, file, indent=4)
-
-lib = Library()
-lib.loadFile("save.txt")
+    def load_from_db(self, db_name: str):
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+        cursor.execute('SELECT ref, name, author, tome, read_status, family FROM books')
+        rows = cursor.fetchall()
+        self.list_books = []
+        for row in rows:
+            ref, name, author, tome, read_status, family = row
+            families = family.split(',') if family else []
+            book = Book(ref, name, author, tome, read_status, families)
+            self.list_books.append(book)
+        conn.close()
+    
+    def init_db(self, db_name:str):
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS books (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ref TEXT,
+                name TEXT,
+                author TEXT,
+                tome INT,
+                read_status BOOLEAN,
+                family TEXT
+            )
+        ''')
+        conn.close()

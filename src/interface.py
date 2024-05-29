@@ -9,7 +9,7 @@ TITLE_STYLE = {
 }
 
 BG="#888888"
-DB="data/save.txt"
+DB="data/data.db"
 
 LABEL_STYLE = {
     "bg" : BG
@@ -24,7 +24,7 @@ PADY10 = {
 }
 
 class Interface():
-    def __init__(self, filePath:str=DB) -> None:
+    def __init__(self) -> None:
         self.window = tk.Tk()
         self.window.title("LibraSync")
         self.window.config(bg=BG)
@@ -32,7 +32,8 @@ class Interface():
         # self.window.state('zoomed')
 
         self.data = Library()
-        self.data.loadFile(DB)
+        self.data.init_db(DB)
+        self.data.load_from_db(DB)
         self.searchConditions = {}
         self.references = []
         self.page:int = 1
@@ -148,6 +149,12 @@ class Interface():
         readEntry.pack(**PADY10)
         self.widgets["read"] = readEntry
 
+        tomeLabel = tk.Label(self.bodyFrame, text="Tome : ", **LABEL_STYLE)
+        tomeLabel.pack()
+        tomeEntry = tk.Entry(self.bodyFrame)
+        tomeEntry.pack(**PADY10)
+        self.widgets["tome"] = tomeEntry
+
         addFamilyButton = tk.Button(self.bodyFrame, text="Add Family", command=lambda : self.addFamily(familiesFrame))
         addFamilyButton.pack(**PADY10)
         
@@ -176,10 +183,11 @@ class Interface():
         inputs = {
             "name":self.widgets["name"].get(),
             "author":self.widgets["author"].get(),
+            "tome":self.widgets["tome"].get(),
             "read":self.widgets["read"].get().lower() in ["true","yes","y"],
             "families": [elt.get() for elt in self.widgets["family"]]
         }
-        self.data.addBook(Book(self.refGenerator(), inputs["name"], inputs["author"], inputs["read"], inputs["families"]))
+        self.data.addBook(Book(self.refGenerator(), inputs["name"], inputs["author"], inputs["tome"], inputs["read"], inputs["families"]))
         self.mainMenu()
     
     def deleteBook(self):
@@ -292,13 +300,13 @@ class Interface():
     def treeview(self):
         clear(self.treeFrame)
 
-        self.tree = ttk.Treeview(self.treeFrame, columns=("Ref","Name","Tome","Author","Family","Read"), show='headings')
+        self.tree = ttk.Treeview(self.treeFrame, columns=("Name","Author","Tome","Family","Read"), show='headings')
 
-        for col in ("Ref", "Name", "Tome", "Author", "Family", "Read"):
+        for col in ("Name", "Tome", "Author", "Family", "Read"):
             self.tree.heading(col, text=col, command=lambda c=col: self.sort_column(self.tree, c, False))
         
         for elt in self.data.select(((self.page-1)*self.nbLine), self.nbLine, where=self.searchConditions):
-            self.tree.insert("","end", values=(elt.ref, elt.name, elt.author, elt.family, elt.read_status))
+            self.tree.insert("","end", values=(elt.name, elt.author, elt.tome, elt.family, elt.read_status))
         
         self.tree.pack()
     
@@ -337,7 +345,8 @@ class Interface():
         backButton.pack()
 
     def exit(self):
-        if self.data.saveFile(self.data.list_books, DB):
+        try:
+            self.data.save_to_db(DB)
             self.window.quit()
-        else:
-            popup(self.window, "Error with saving data.")
+        except Exception as e:
+            popup(self.window, f"Error with saving data:\n{e}")
