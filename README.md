@@ -28,7 +28,7 @@ A easy use Manager for your books collection.
 
 [x] add Tome input in the add book form
 
-[] upgrade DB management (SQLite or other)
+[x] upgrade DB management (SQLite or other)
 
 [] dark/day mode
 
