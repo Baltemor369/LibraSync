@@ -1,8 +1,12 @@
-# LibraSync
+# **LibraSync**
 
 A easy use Manager for your books collection.
 
-## Features
+## **Requierements**
+
+- **Python 3.11.1**
+
+## **Features**
 
 - add a book
 
