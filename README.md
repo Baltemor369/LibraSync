@@ -28,7 +28,7 @@ A easy use Manager for your books collection.
 
 [x] add Tome input in the add book form
 
-[] add as many as books are in Tome || let a string to inform Tome information ?
+[] add as many books as there are in Tome || let a string to inform Tome information ?
 
 [x] upgrade DB management (SQLite or other)
 
@@ -38,7 +38,7 @@ A easy use Manager for your books collection.
 
 [] update all widgets to apply the new color
 
-[] select more esthetic colors for light
+[] select more esthetic colors for light mode
 
 [] select more esthetic colors for dark mode
 

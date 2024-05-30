@@ -9,10 +9,10 @@ class Interface():
     def __init__(self) -> None:
         self.data_path = "data/data.db"
         self.params = {
-            "bg":"#EFEFEF",
-            "fg":"#010101",
-            "field-bg":"#2E2E2E",
-            "bg-button":"#DADADA",
+            "bg":"#232323",
+            "fg":"#EFEFEF",
+            "field-bg":"#454545",
+            "bg-button":"#000000",
             
             "nbLine":10,
             "path":"data/data.db",
@@ -46,7 +46,7 @@ class Interface():
     def header(self):      
         clear(self.headerFrame)
 
-        title = tk.Label(self.headerFrame, text="My Library", font=("Helvetica",34), bg=self.params["bg"])
+        title = tk.Label(self.headerFrame, text="My Library", font=("Helvetica",34), bg=self.params["bg"], fg=self.params["fg"])
         title.pack()
 
     def mainMenu(self):
@@ -55,7 +55,7 @@ class Interface():
 
         self.selected_item = {}
 
-        self.headerFrame = tk.Frame(self.window)
+        self.headerFrame = tk.Frame(self.window, bg=self.params["bg"])
         self.headerFrame.pack(fill="x", pady=20)
 
         self.header()
@@ -141,25 +141,25 @@ class Interface():
         self.window.geometry("500x600")
         self.widgets["family"] = []
 
-        nameLabel = tk.Label(self.bodyFrame, text="Name : ")
+        nameLabel = tk.Label(self.bodyFrame, text="Name : ", bg=self.params["bg"], fg=self.params["fg"])
         nameLabel.pack()
         nameEntry = tk.Entry(self.bodyFrame)
         nameEntry.pack(pady=10)
         self.widgets["name"] = nameEntry
 
-        authorLabel = tk.Label(self.bodyFrame, text="Author : ")
+        authorLabel = tk.Label(self.bodyFrame, text="Author : ", bg=self.params["bg"], fg=self.params["fg"])
         authorLabel.pack()
         authorEntry = tk.Entry(self.bodyFrame)
         authorEntry.pack(pady=10)
         self.widgets["author"] = authorEntry
 
-        readLabel = tk.Label(self.bodyFrame, text="Read : ")
+        readLabel = tk.Label(self.bodyFrame, text="Read : ", bg=self.params["bg"], fg=self.params["fg"])
         readLabel.pack()
         readEntry = tk.Entry(self.bodyFrame)
         readEntry.pack(pady=10)
         self.widgets["read"] = readEntry
 
-        tomeLabel = tk.Label(self.bodyFrame, text="Tome : ")
+        tomeLabel = tk.Label(self.bodyFrame, text="Tome : ", bg=self.params["bg"], fg=self.params["fg"])
         tomeLabel.pack()
         tomeEntry = tk.Entry(self.bodyFrame)
         tomeEntry.pack(pady=10)
