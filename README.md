@@ -28,14 +28,20 @@ A easy use Manager for your books collection.
 
 [x] add Tome input in the add book form
 
+[] add as many as books are in Tome || let a string to inform Tome information ?
+
 [x] upgrade DB management (SQLite or other)
 
-[x] dark/day mode
+[x] data path settings 
+
+[] dark/day mode
 
 [] update all widgets to apply the new color
 
-[] select more esthetic colors
+[] select more esthetic colors for light
 
-[] nb books dispkay at the same time (5-50)
+[] select more esthetic colors for dark mode
+
+[x] nb books dispkay at the same time (5-50)
 
 [] set a icon

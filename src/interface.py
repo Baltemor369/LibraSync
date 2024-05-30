@@ -38,6 +38,7 @@ class Interface():
         self.data.init_db(self.params["path"])
         self.data.load_from_db(self.params["path"])
         self.searchConditions = {}
+        self.widgets:dict[str,tk.Entry|list] = {}
         self.params["page"] = 1
         self.mainMenu()
 
@@ -137,10 +138,7 @@ class Interface():
 
         self.header()
 
-        
-
         self.window.geometry("500x600")
-        self.widgets:dict[str,tk.Entry|list] = {}
         self.widgets["family"] = []
 
         nameLabel = tk.Label(self.bodyFrame, text="Name : ")
