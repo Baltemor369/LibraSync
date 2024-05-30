@@ -37,3 +37,5 @@ A easy use Manager for your books collection.
 [] select more esthetic colors
 
 [] nb books dispkay at the same time (5-50)
+
+[] set a icon

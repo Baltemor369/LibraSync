@@ -1,16 +1,23 @@
-import tkinter as tk
 import uuid
+import tkinter as tk
 from tkinter import ttk
-from src.tkTools import clear, popup
+from src.tkTools import clear, popup, prompt
+from src.osTools import create_path, path
 from src.library import Library,Book
 
 class Interface():
     def __init__(self) -> None:
         self.data_path = "data/data.db"
         self.params = {
-            "bg":"#EEEEEE",
-            "fg":"#000000",
-            "bg-button":"#CCCCCC",
+            "bg":"#EFEFEF",
+            "fg":"#010101",
+            "field-bg":"#2E2E2E",
+            "bg-button":"#DADADA",
+            
+            "nbLine":10,
+            "path":"data/data.db",
+            "old_path":"data/data.db",
+            "page":1,
         }
 
         self.window = tk.Tk()
@@ -22,31 +29,35 @@ class Interface():
         # Configuration treeview style
         style = ttk.Style()
         style.configure("Custom.Treeview", 
-                        background=self.params["bg-button"],
-                        fieldbackground="#2E2E2E",
+                        background=self.params["bg"],
+                        fieldbackground=self.params["field-bg"],
                         foreground=self.params["fg"])
-        style.map('Custom.Treeview', background=[('selected', '#4A4A4A')], foreground=[('selected', 'white')])
+        style.map('Custom.Treeview', background=[('selected', self.params["bg-button"])], foreground=[('selected', self.params["fg"])])
 
         self.data = Library()
-        self.data.init_db(self.data_path)
-        self.data.load_from_db(self.data_path)
+        self.data.init_db(self.params["path"])
+        self.data.load_from_db(self.params["path"])
         self.searchConditions = {}
-        self.references = []
-        self.page:int = 1
-        self.nbLine = 10
+        self.params["page"] = 1
         self.mainMenu()
 
         self.window.mainloop()
+    def header(self):      
+        clear(self.headerFrame)
+
+        title = tk.Label(self.headerFrame, text="My Library", font=("Helvetica",34), bg=self.params["bg"])
+        title.pack()
 
     def mainMenu(self):
         clear(self.window)
         self.window.geometry("1000x500")
 
         self.selected_item = {}
-        
-        title = tk.Label(self.window, text="My Library", font=("Helvetica",34), bg=self.params["bg"])
-        title.pack(pady=30)
 
+        self.headerFrame = tk.Frame(self.window)
+        self.headerFrame.pack(fill="x", pady=20)
+
+        self.header()
 
         self.bodyFrame = tk.Frame(self.window, bg=self.params["bg"])
         self.bodyFrame.pack()
@@ -82,7 +93,7 @@ class Interface():
         self.searchBar2.bind("<Return>", self.searching)
         self.searchBar2.insert(0, "Read")
 
-        startSearching = tk.Button(searchingFrame, text="Search", command=self.searching, width=10, bg=self.params["bg-button"])
+        startSearching = tk.Button(searchingFrame, text="Search", command=self.searching, width=10, bg=self.params["bg-button"], fg=self.params["fg"])
         startSearching.pack(side="left", anchor="n", padx=10)
         
         self.treeFrame = tk.Frame(self.bodyFrame, bg=self.params["bg"])
@@ -98,31 +109,36 @@ class Interface():
     def  buttons(self):
         clear(self.buttonsFrame)
 
-        if self.page > 1:
-            previousButton = tk.Button(self.buttonsFrame, text="Previous", width=15, command=self.previous, bg=self.params["bg-button"])
+        if self.params["page"] > 1:
+            previousButton = tk.Button(self.buttonsFrame, text="Previous", width=15, command=self.previous, bg=self.params["bg-button"], fg=self.params["fg"])
             previousButton.pack(side="left", anchor="n", padx=10)
 
-        addButton = tk.Button(self.buttonsFrame, text="Add", width=15, command=self.addNewBookMenu, bg=self.params["bg-button"])
+        addButton = tk.Button(self.buttonsFrame, text="Add", width=15, command=self.addNewBookMenu, bg=self.params["bg-button"], fg=self.params["fg"])
         addButton.pack(side="left", anchor="n", padx=10)
 
-        modifyButton = tk.Button(self.buttonsFrame, text="Modify", width=15, command=self.modify_selected_row, bg=self.params["bg-button"])
+        modifyButton = tk.Button(self.buttonsFrame, text="Modify", width=15, command=self.modify_selected_row, bg=self.params["bg-button"], fg=self.params["fg"])
         modifyButton.pack(side="left", anchor="n", padx=10)
 
-        delButton = tk.Button(self.buttonsFrame, text="Delete", width=15, command=self.deleteBook, bg=self.params["bg-button"])
+        delButton = tk.Button(self.buttonsFrame, text="Delete", width=15, command=self.deleteBook, bg=self.params["bg-button"], fg=self.params["fg"])
         delButton.pack(side="left", anchor="n", padx=10)
 
-        settingsButton = tk.Button(self.buttonsFrame, text="Settings", width=15, command=self.settingsMenu, bg=self.params["bg-button"])
+        settingsButton = tk.Button(self.buttonsFrame, text="Settings", width=15, command=self.settingsMenu, bg=self.params["bg-button"], fg=self.params["fg"])
         settingsButton.pack(side="left", anchor="n", padx=10)
 
-        exitButton = tk.Button(self.buttonsFrame, text="Quit", width=15, command=self.exit, bg=self.params["bg-button"])
+        exitButton = tk.Button(self.buttonsFrame, text="Quit", width=15, command=self.exit, bg=self.params["bg-button"], fg=self.params["fg"])
         exitButton.pack(side="left", anchor="n", padx=10)
 
-        if len(self.data.list_books) > ((self.page-1)*10+10):
-            nextButton = tk.Button(self.buttonsFrame, text="Next", width=15, command=self.next, bg=self.params["bg-button"])
+        if len(self.data.list_books) > ((self.params["page"]-1)*self.params["nbLine"]+self.params["nbLine"]):
+            nextButton = tk.Button(self.buttonsFrame, text="Next", width=15, command=self.next, bg=self.params["bg-button"], fg=self.params["fg"])
             nextButton.pack(side="left", anchor="n", padx=10)    
     
     def addNewBookMenu(self):
         clear(self.bodyFrame)
+
+        self.header()
+
+        
+
         self.window.geometry("500x600")
         self.widgets:dict[str,tk.Entry|list] = {}
         self.widgets["family"] = []
@@ -151,19 +167,19 @@ class Interface():
         tomeEntry.pack(pady=10)
         self.widgets["tome"] = tomeEntry
 
-        addFamilyButton = tk.Button(self.bodyFrame, text="Add Family", command=lambda : self.addFamily(familiesFrame), bg=self.params["bg-button"])
+        addFamilyButton = tk.Button(self.bodyFrame, text="Add Family", command=lambda : self.addFamily(familiesFrame), bg=self.params["bg-button"], fg=self.params["fg"])
         addFamilyButton.pack(pady=10)
         
-        clearButton = tk.Button(self.bodyFrame, text="Clear", command=lambda : clear(familiesFrame), bg=self.params["bg-button"])
+        clearButton = tk.Button(self.bodyFrame, text="Clear", command=lambda : clear(familiesFrame), bg=self.params["bg-button"], fg=self.params["fg"])
         clearButton.pack(pady=10)
         
         familiesFrame = tk.Frame(self.bodyFrame, bg=self.params["bg"])
         familiesFrame.pack(pady=10)       
 
-        addButton = tk.Button(self.bodyFrame, text="Add", width=15, command=self.newBook, bg=self.params["bg-button"])
+        addButton = tk.Button(self.bodyFrame, text="Add", width=15, command=self.newBook, bg=self.params["bg-button"], fg=self.params["fg"])
         addButton.pack(pady=10)
 
-        backButton = tk.Button(self.bodyFrame, text="Back", width=15, command=self.mainMenu, bg=self.params["bg-button"])
+        backButton = tk.Button(self.bodyFrame, text="Back", width=15, command=self.mainMenu, bg=self.params["bg-button"], fg=self.params["fg"])
         backButton.pack()
     
     def addFamily(self, frame:tk.Frame|tk.Tk, value:str=""):
@@ -203,6 +219,9 @@ class Interface():
 
     def modify_book_menu(self, values):
         clear(self.bodyFrame)
+
+        
+
         self.window.geometry("500x600")
         self.widgets = {}
         self.widgets["family"] = []
@@ -234,13 +253,13 @@ class Interface():
         for family in values[3].split():
             self.addFamily(familiesFrame, family)
 
-        addFamilyButton = tk.Button(self.bodyFrame, text="Add Family", command=lambda: self.addFamily(familiesFrame), bg=self.params["bg-button"])
+        addFamilyButton = tk.Button(self.bodyFrame, text="Add Family", command=lambda: self.addFamily(familiesFrame), bg=self.params["bg-button"], fg=self.params["fg"])
         addFamilyButton.pack(pady=10)
 
-        addButton = tk.Button(self.bodyFrame, text="Modify", width=15, command=self.updateBook, bg=self.params["bg-button"])
+        addButton = tk.Button(self.bodyFrame, text="Modify", width=15, command=self.updateBook, bg=self.params["bg-button"], fg=self.params["fg"])
         addButton.pack(pady=10)
 
-        backButton = tk.Button(self.bodyFrame, text="Back", width=15, command=self.mainMenu, bg=self.params["bg-button"])
+        backButton = tk.Button(self.bodyFrame, text="Back", width=15, command=self.mainMenu, bg=self.params["bg-button"], fg=self.params["fg"])
         backButton.pack()
     
     def updateBook(self):
@@ -301,7 +320,7 @@ class Interface():
         for col in ("Name", "Tome", "Author", "Family", "Read"):
             self.tree.heading(col, text=col, command=lambda c=col: self.sort_column(self.tree, c, False))
         
-        for elt in self.data.select(((self.page-1)*self.nbLine), self.nbLine, where=self.searchConditions):
+        for elt in self.data.select(((self.params["page"]-1)*self.params["nbLine"]), self.params["nbLine"], where=self.searchConditions):
             self.tree.insert("","end", values=(elt.name, elt.author, elt.tome, elt.family, elt.read_status))
         
         self.tree.pack()
@@ -316,46 +335,58 @@ class Interface():
         tree.heading(col, command=lambda: self.sort_column(tree, col, not reverse))
 
     def next(self):
-        self.page += 1
+        self.params["page"] += 1
         self.treeview()
         self.buttons()
     
     def previous(self):
-        self.page -= 1
+        self.params["page"] -= 1
         self.treeview()
         self.buttons()
     
     def settingsMenu(self):
         clear(self.bodyFrame)
 
-        dark_mode_button = tk.Button(self.bodyFrame, text="DarkMode", command=self.switch_mode, bg=self.params["bg-button"])
-        dark_mode_button.pack()
-
-        label = tk.Label(self.bodyFrame, text="NbLineDisplay", bg=self.params["bg"])
+        label = tk.Label(self.bodyFrame, text="Nb Line Display", bg=self.params["bg"], fg=self.params["fg"])
         label.pack()
 
-        # number input
+        nbEntry = tk.Entry(self.bodyFrame)
+        nbEntry.insert(0, str(self.params["nbLine"]))
+        nbEntry.pack()
+        self.widgets["nbLine"] = nbEntry
         
-        pathLabel = tk.Label(self.bodyFrame, text="SaveFilePath", bg=self.params["bg"])
+        pathLabel = tk.Label(self.bodyFrame, text="Saved File Path", bg=self.params["bg"], fg=self.params["fg"])
         pathLabel.pack()
 
-        # text input
+        pathEntry = tk.Entry(self.bodyFrame)
+        pathEntry.insert(0, self.params["path"])
+        pathEntry.pack()
+        self.widgets["path"] = pathEntry
 
-        backButton = tk.Button(self.bodyFrame, text="Back", width=15, command=self.mainMenu, bg=self.params["bg-button"])
-        backButton.pack()
+        saveButton = tk.Button(self.bodyFrame, text="Save", width=15, command=self.mainMenu, bg=self.params["bg-button"], fg=self.params["fg"])
+        saveButton.pack(pady=10)
 
-    def switch_mode(self):
-        # change colors definition 
-        self.params["bg"] = "#333333" if self.params["bg"] != "#333333" else "#EEEEEE"
-        self.params["fg"] = "#FFFFFF" if self.params["fg"] != "#FFFFFF" else "#000000"
-        self.params["bg-button"] = "#CCCCCC" if self.params["bg-button"] != "#CCCCCC" else "#555555"
-        
-        # redirect to settings menu
-        self.settingsMenu()
+        backButton = tk.Button(self.bodyFrame, text="Back", width=15, command=self.mainMenu, bg=self.params["bg-button"], fg=self.params["fg"])
+        backButton.pack(pady=10)
+    
+    def saveSettings(self):
+        nb_line = self.widgets["nbLine"].get()
+        new_path = self.widgets["path"].get()
+
+        if path.exists(new_path):
+            self.params["old_path"] = self.params["path"]
+            self.params["path"] = new_path
+        else:
+            response = prompt("Create path", f"the path {new_path} doesn't exist,\nDo you want to create it ?")
+            if response:
+                create_path(new_path)
+
+        if 10 < nb_line < 50 :   
+            self.params["nbLine"] = nb_line 
 
     def exit(self):
         try:
-            self.data.save_to_db(self.data_path)
+            self.data.save_to_db(self.params["path"])
             self.window.quit()
         except Exception as e:
             popup(self.window, f"Error with saving data:\n{e}")

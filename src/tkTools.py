@@ -54,3 +54,7 @@ def popup(self:tkinter.Tk|tkinter.Frame, text:str|dict, title:str="Alert", bg:st
             label.pack()
 
     set_geometry(popup)
+
+def prompt(title:str, question:str):
+    confirmation = tkinter.messagebox.askokcancel(title, question)
+    return confirmation
