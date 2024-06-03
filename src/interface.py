@@ -23,6 +23,8 @@ class Interface():
         self.window = tk.Tk()
         self.window.title("LibraSync")
         self.window.config(bg=self.params["bg"])
+        icon = tk.PhotoImage(file='img/livre.png')
+        self.window.iconphoto(True, icon)
         self.window.protocol("WM_DELETE_WINDOW", self.exit)
         # self.window.state('zoomed')
 

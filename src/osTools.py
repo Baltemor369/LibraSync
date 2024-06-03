@@ -16,5 +16,3 @@ def create_path(file_path:str):
         print(f"Le chemin ou le fichier existe déjà : {file_path}")
     except Exception as e:
         print(f"Erreur lors de la création du chemin ou du fichier : {e}")
-    
-create_path("test/test/test/test.txt")
