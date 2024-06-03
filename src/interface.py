@@ -1,5 +1,6 @@
 import uuid
 import tkinter as tk
+import re
 from tkinter import ttk
 from src.tkTools import clear, popup, prompt
 from src.osTools import create_path, path
@@ -199,15 +200,46 @@ class Interface():
             "read":self.widgets["read"].get().lower() in ["true","yes","y"],
             "families": [elt.get() for elt in self.widgets["family"]]
         }
-        self.data.addBook(Book(self.refGenerator(), inputs["name"], inputs["author"], inputs["tome"], inputs["read"], inputs["families"]))
-        self.mainMenu()
+        tomes = self.tome_analyze(inputs["tome"])
+        if tomes == []:
+            popup(self.window, "Invalid Tome inputs.", "Error")
+        else:
+            for i in tomes:
+                self.data.addBook(Book(self.refGenerator(), inputs["name"], inputs["author"], i, inputs["read"], inputs["families"]))
+            self.mainMenu()
     
+    def tome_analyze(self, text:str):
+        tomes:list[int] = []
+        
+        if not re.match(r"^(\d+(-\d+)?)(,\d+(-\d+)?)*$", text):
+            return []
+        
+        text = text.split(",")
+        for rng in text:
+            if '-' in rng:
+                start, end = map(int, rng.split('-'))
+                if start >= end:
+                    return []
+
+        for elt in text:
+            if '-' in elt:
+                tmp = elt.split("-")
+                for i in range(int(tmp[0]),int(tmp[1])+1):
+                    tomes.append(i)
+            else:
+                tomes.append(int(elt))
+
+        
+        return tomes
+    
+
     def deleteBook(self):
         selected_item = self.tree.selection()
         if selected_item:
-            ref = self.tree.item(selected_item, "values")[0]
-            self.tree.delete(selected_item)
-            self.data.removeBook(ref)
+            for elt in selected_item:
+                ref = self.tree.item(elt, "values")[0]
+                self.tree.delete(elt)
+                self.data.removeBook(ref)
 
     def modify_selected_row(self):
         self.selected_item = self.tree.selection()
