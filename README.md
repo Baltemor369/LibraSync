@@ -26,7 +26,7 @@ A easy use Manager for your books collection.
 
 [x] add Tome input in the add book form
 
-[] add as many books as there are in Tome ?
+[x] add as many books as there are in Tome ?
 
 [x] upgrade DB management (SQLite or other)
 
@@ -34,4 +34,4 @@ A easy use Manager for your books collection.
 
 [x] nb books dispkay at the same time (5-50)
 
-[] set a icon
+[x] set a icon

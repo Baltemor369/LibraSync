@@ -232,7 +232,6 @@ class Interface():
         
         return tomes
     
-
     def deleteBook(self):
         selected_item = self.tree.selection()
         if selected_item:
