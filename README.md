@@ -2,13 +2,17 @@
 
 A easy use Manager for your books collection.
 
-## **How to Install**
+## **How to Run**
+
+1. Download the ZIP
+2. Unzip it
+3. In the folder, find "main.exe" and double-click on.
 
 ## **Features**
 
-- add a book
+- add books
 
-- delete a book
+- delete books
 
 - modify a book
 
@@ -19,19 +23,3 @@ A easy use Manager for your books collection.
 - settings menu
 
 - save your data in a file
-
-## Todo
-
-[x] add Tome category in the tab
-
-[x] add Tome input in the add book form
-
-[x] add as many books as there are in Tome ?
-
-[x] upgrade DB management (SQLite or other)
-
-[x] data path settings 
-
-[x] nb books dispkay at the same time (5-50)
-
-[x] set a icon
