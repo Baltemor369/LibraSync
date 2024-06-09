@@ -35,18 +35,16 @@ class Library:
                 result.append(book)
         return result
 
-    def select(self, start:int=0, count:int=1, where:dict={}):
+    def select(self, start:int=0, count:int=-1, where:dict={}):
         selection:list[Book] = []
         for book in self.list_books[start:]:
-            # verify : value empty = True || value == book.value = True || value can be found in book.value = True (like book ~= book1)
             try:
+                # verify : value empty = True || value == book.value = True || value in book.value = True 
                 if all(getattr(book, key) == value or value == "" or value.lower() in getattr(book, key).lower() for key, value in where.items()):
                     selection.append(book)
                     count -= 1
-            except:
-                if all(getattr(book, key) == value or value == "" or value.lower() in ' '.join(getattr(book, key)).lower() for key, value in where.items()):
-                    selection.append(book)
-                    count -= 1
+            except Exception as e :
+                print(e)
             
             if count == 0:
                 break

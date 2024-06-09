@@ -83,6 +83,13 @@ class Interface():
         self.searchBar1.bind("<Return>", self.searching)
         self.searchBar1.insert(0, "Author")
         
+        self.searchBar2 = tk.Entry(searchingFrame, width=10)
+        self.searchBar2.pack(side="left", anchor="n", padx=10)
+        self.searchBar2.bind("<FocusIn>", self.clear_entry)
+        self.searchBar2.bind("<FocusOut>", self.fill_tome_entry)
+        self.searchBar2.bind("<Return>", self.searching)
+        self.searchBar2.insert(0, "Tome")
+        
         self.searchBar3 = tk.Entry(searchingFrame, width=30)
         self.searchBar3.pack(side="left", anchor="n", padx=10)
         self.searchBar3.bind("<FocusIn>", self.clear_entry)
@@ -90,12 +97,12 @@ class Interface():
         self.searchBar3.bind("<Return>", self.searching)
         self.searchBar3.insert(0, "Family")
 
-        self.searchBar2 = tk.Entry(searchingFrame, width=20)
-        self.searchBar2.pack(side="left", anchor="n", padx=10)
-        self.searchBar2.bind("<FocusIn>", self.clear_entry)
-        self.searchBar2.bind("<FocusOut>", self.fill_status_entry)
-        self.searchBar2.bind("<Return>", self.searching)
-        self.searchBar2.insert(0, "Read")
+        self.searchBar4 = tk.Entry(searchingFrame, width=10)
+        self.searchBar4.pack(side="left", anchor="n", padx=10)
+        self.searchBar4.bind("<FocusIn>", self.clear_entry)
+        self.searchBar4.bind("<FocusOut>", self.fill_status_entry)
+        self.searchBar4.bind("<Return>", self.searching)
+        self.searchBar4.insert(0, "Read")
 
         startSearching = tk.Button(searchingFrame, text="Search", command=self.searching, width=10, bg=self.params["bg-button"], fg=self.params["fg"])
         startSearching.pack(side="left", anchor="n", padx=10)
@@ -239,6 +246,10 @@ class Interface():
                 ref = self.tree.item(elt, "values")[0]
                 self.tree.delete(elt)
                 self.data.removeBook(ref)
+                self.tree.insert("", 'end', text="Nouvelle Ligne", values=("Nouveau1","Nouveau2","Nouveau3"))
+        
+        self.treeview()
+
 
     def modify_selected_row(self):
         self.selected_item = self.tree.selection()
@@ -314,7 +325,7 @@ class Interface():
         return str(uuid.uuid4())
 
     def clear_entry(self, event):
-        if event.widget.get() in ["Name", "Author", "Read", "Family"]:
+        if event.widget.get() in ["Name", "Author","Tome", "Read", "Family"]:
             event.widget.delete(0, "end")
     
     def fill_name_entry(self, event):
@@ -323,6 +334,9 @@ class Interface():
     def fill_author_entry(self, event):
         if event.widget.get() == "":
             event.widget.insert(0, "Author")
+    def fill_tome_entry(self, event):
+        if event.widget.get() == "":
+            event.widget.insert(0, "Tome")
     def fill_status_entry(self, event):
         if event.widget.get() == "":
             event.widget.insert(0, "Read")
@@ -336,8 +350,9 @@ class Interface():
         args = {
             "name":self.searchBar.get() if self.searchBar.get() != "Name" else "",
             "author":self.searchBar1.get() if self.searchBar1.get() != "Author" else "",
-            "read_status":self.searchBar2.get() if self.searchBar2.get() != "Read" else "",
-            "family":self.searchBar3.get() if self.searchBar3.get() != "Family" else ""
+            "tome":self.searchBar2.get() if self.searchBar2.get() != "Tome" else "",
+            "read_status":self.searchBar3.get() if self.searchBar3.get() != "Read" else "",
+            "family":self.searchBar4.get() if self.searchBar4.get() != "Family" else ""
         }
         self.searchConditions = args
 
@@ -345,15 +360,23 @@ class Interface():
 
     def treeview(self):
         clear(self.treeFrame)
+        columns = ("Ref", "Name","Author","Tome","Family","Read")
+        self.tree = ttk.Treeview(self.treeFrame, style="Custom.Treeview", columns=columns, show='headings')
 
-        self.tree = ttk.Treeview(self.treeFrame, style="Custom.Treeview", columns=("Name","Author","Tome","Family","Read"), show='headings')
-
-        for col in ("Name", "Tome", "Author", "Family", "Read"):
+        for col in columns:
             self.tree.heading(col, text=col, command=lambda c=col: self.sort_column(self.tree, c, False))
+            self.tree.column(col, anchor="center")
         
-        for elt in self.data.select(((self.params["page"]-1)*self.params["nbLine"]), self.params["nbLine"], where=self.searchConditions):
-            self.tree.insert("","end", values=(elt.name, elt.author, elt.tome, elt.family, elt.read_status))
+        ls = self.data.select(((self.params["page"]-1)*self.params["nbLine"]), self.params["nbLine"], where=self.searchConditions) 
+        if len(ls)==0:
+            self.params["page"] -= 1 if self.params["page"] > 0 else 0
+            ls = self.data.select(((self.params["page"]-1)*self.params["nbLine"]), self.params["nbLine"], where=self.searchConditions)
+
+        for elt in ls:
+            self.tree.insert("","end", values=(elt.ref, elt.name, elt.author, elt.tome, elt.family, elt.read_status))
         
+        self.tree.column("Ref", width=30)
+        self.tree.column("Tome", width=50)
         self.tree.pack()
     
     def sort_column(self, tree, col, reverse):

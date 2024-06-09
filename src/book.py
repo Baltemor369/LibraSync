@@ -8,4 +8,4 @@ class Book:
         self.family = family
 
     def info(self):
-        return self.ref + " " + self.name + " " + self.author + " " + self.tome + " " + self.family
+        return self.ref + " " + self.name + " " + self.author + " " + str(self.tome) + " ".join(self.family)
