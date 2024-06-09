@@ -112,37 +112,42 @@ class Interface():
 
         self.treeview()
 
-        self.buttonsFrame = tk.Frame(self.bodyFrame, bg=self.params["bg"])
-        self.buttonsFrame.pack(pady=10)
+        self.buttons1Frame = tk.Frame(self.bodyFrame, bg=self.params["bg"])
+        self.buttons1Frame.pack(pady=10)
+        
+        self.buttons2Frame = tk.Frame(self.bodyFrame, bg=self.params["bg"])
+        self.buttons2Frame.pack(pady=10)
 
+        self.buttonsPage()
         self.buttons()
 
-    def  buttons(self):
-        clear(self.buttonsFrame)
+    def  buttonsPage(self):
+        clear(self.buttons1Frame)
 
         if self.params["page"] > 1:
-            previousButton = tk.Button(self.buttonsFrame, text="Previous", width=15, command=self.previous, bg=self.params["bg-button"], fg=self.params["fg"])
+            previousButton = tk.Button(self.buttons1Frame, text="Previous", width=15, command=self.previous, bg=self.params["bg-button"], fg=self.params["fg"])
             previousButton.pack(side="left", anchor="n", padx=10)
 
-        addButton = tk.Button(self.buttonsFrame, text="Add", width=15, command=self.addNewBookMenu, bg=self.params["bg-button"], fg=self.params["fg"])
-        addButton.pack(side="left", anchor="n", padx=10)
-
-        modifyButton = tk.Button(self.buttonsFrame, text="Modify", width=15, command=self.modify_selected_row, bg=self.params["bg-button"], fg=self.params["fg"])
-        modifyButton.pack(side="left", anchor="n", padx=10)
-
-        delButton = tk.Button(self.buttonsFrame, text="Delete", width=15, command=self.deleteBook, bg=self.params["bg-button"], fg=self.params["fg"])
-        delButton.pack(side="left", anchor="n", padx=10)
-
-        settingsButton = tk.Button(self.buttonsFrame, text="Settings", width=15, command=self.settingsMenu, bg=self.params["bg-button"], fg=self.params["fg"])
-        settingsButton.pack(side="left", anchor="n", padx=10)
-
-        exitButton = tk.Button(self.buttonsFrame, text="Quit", width=15, command=self.exit, bg=self.params["bg-button"], fg=self.params["fg"])
-        exitButton.pack(side="left", anchor="n", padx=10)
-
         if len(self.data.list_books) > ((self.params["page"]-1)*self.params["nbLine"]+self.params["nbLine"]):
-            nextButton = tk.Button(self.buttonsFrame, text="Next", width=15, command=self.next, bg=self.params["bg-button"], fg=self.params["fg"])
+            nextButton = tk.Button(self.buttons1Frame, text="Next", width=15, command=self.next, bg=self.params["bg-button"], fg=self.params["fg"])
             nextButton.pack(side="left", anchor="n", padx=10)    
     
+    def buttons(self):
+        addButton = tk.Button(self.buttons2Frame, text="Add", width=15, command=self.addNewBookMenu, bg=self.params["bg-button"], fg=self.params["fg"])
+        addButton.pack(side="left", anchor="n", padx=10)
+
+        modifyButton = tk.Button(self.buttons2Frame, text="Modify", width=15, command=self.modify_selected_row, bg=self.params["bg-button"], fg=self.params["fg"])
+        modifyButton.pack(side="left", anchor="n", padx=10)
+
+        delButton = tk.Button(self.buttons2Frame, text="Delete", width=15, command=self.deleteBook, bg=self.params["bg-button"], fg=self.params["fg"])
+        delButton.pack(side="left", anchor="n", padx=10)
+
+        settingsButton = tk.Button(self.buttons2Frame, text="Settings", width=15, command=self.settingsMenu, bg=self.params["bg-button"], fg=self.params["fg"])
+        settingsButton.pack(side="left", anchor="n", padx=10)
+
+        exitButton = tk.Button(self.buttons2Frame, text="Quit", width=15, command=self.exit, bg=self.params["bg-button"], fg=self.params["fg"])
+        exitButton.pack(side="left", anchor="n", padx=10)
+
     def addNewBookMenu(self):
         clear(self.bodyFrame)
 
@@ -391,12 +396,12 @@ class Interface():
     def next(self):
         self.params["page"] += 1
         self.treeview()
-        self.buttons()
+        self.buttonsPage()
     
     def previous(self):
         self.params["page"] -= 1
         self.treeview()
-        self.buttons()
+        self.buttonsPage()
     
     def settingsMenu(self):
         clear(self.bodyFrame)
