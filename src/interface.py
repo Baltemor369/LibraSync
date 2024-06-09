@@ -255,7 +255,6 @@ class Interface():
         
         self.treeview()
 
-
     def modify_selected_row(self):
         self.selected_item = self.tree.selection()
         self.item_values = self.tree.item(self.selected_item, "values")
@@ -266,8 +265,6 @@ class Interface():
 
     def modify_book_menu(self, values):
         clear(self.bodyFrame)
-
-        
 
         self.window.geometry("500x600")
         self.widgets = {}
@@ -323,8 +320,6 @@ class Interface():
                 book.author = author
                 book.family = families
                 book.read_status = read_status == "true"
-
-            self.mainMenu()
     
     def refGenerator(self):
         return str(uuid.uuid4())
