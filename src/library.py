@@ -54,13 +54,20 @@ class Library:
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
         for book in self.list_books:
-            cursor.execute('SELECT COUNT(*) FROM books WHERE ref = ?', (book.ref,))
-            count = cursor.fetchone()[0]
-            if count==0:
+            cursor.execute('SELECT * FROM books WHERE ref = ?', (book.ref,))
+            row = cursor.fetchone()
+            if row is None:
                 cursor.execute('''
                     INSERT INTO books (ref, name, author, tome, read_status, family)
                     VALUES (?, ?, ?, ?, ?, ?)
                 ''', (book.ref, book.name, book.author, book.tome, book.read_status, ','.join(book.family)))
+            else:
+                if (row[1], row[2], row[3], row[4], row[5]) != (book.name, book.author, book.tome, book.read_status, ','.join(book.family)):
+                    cursor.execute('''
+                        UPDATE books
+                        SET name = ?, author = ?, tome = ?, read_status = ?, family = ?
+                        WHERE ref = ?
+                    ''', (book.name, book.author, book.tome, book.read_status, ','.join(book.family), book.ref))
         conn.commit()
         conn.close()
 
