@@ -4,8 +4,8 @@ A easy use Manager for your books collection.
 
 ## **How to Run**
 
-1. Download the folder "LibraSync"
-2. double click on "main.exe"
+1. Download the repository
+2. double click on "run.bat"
 
 ## **Features**
 
@@ -21,6 +21,6 @@ A easy use Manager for your books collection.
 
 - Search inputs are usefull to find easily what you want. 
 
-- In the settings menu, change the datafile location, or the number of line in the tab. 
+- In the settings menu, change the datafile location, or the number of line in the tab.
 
 - to keep a session between each app launch, you data are save in a file.
