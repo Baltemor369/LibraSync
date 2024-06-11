@@ -14,4 +14,4 @@ A easy use Manager for your books collection.
 
 - put a login at the beginning
 
-- save data on a own server cloud.
+- learn Google cloud API, to save data on the cloud of the user.
