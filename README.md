@@ -2,6 +2,10 @@
 
 A easy use Manager for your books collection.
 
+## **Requirements**
+
+- **Python 3.11.1**
+
 ## **How to Run**
 
 1. Download the repository
