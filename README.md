@@ -10,6 +10,8 @@ A easy use Manager for your books collection.
 
 ## **Todo**
 
+- save profil settings in a file to keep between each session.
+
 - put a login at the beginning
 
 - save data on a own server cloud.
