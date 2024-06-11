@@ -4,18 +4,23 @@ A easy use Manager for your books collection.
 
 ## **How to Run**
 
+1. Download the folder "LibraSync"
+2. double click on "main.exe"
+
 ## **Features**
 
-- add books
+- Books collection display in a simple tab.
 
-- delete books
+- The collection can be sort by clicking on header name, author or family.
 
-- modify a book
+- Add as many books as you want. _tips: In tome, a entry like "1-10" will automatically add books from the first to tenth._
 
-- sort list of books
+- Possibility to delete a selection of books.
 
-- search a book by its name/author/Family
+- To modify the informations of a or several book(s), select them and click "modify", you could modify one by one books selected.
 
-- settings menu
+- Search inputs are usefull to find easily what you want. 
 
-- save your data in a file
+- In the settings menu, change the datafile location, or the number of line in the tab. 
+
+- to keep a session between each app launch, you data are save in a file.
