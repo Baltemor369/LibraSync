@@ -19,7 +19,7 @@ A easy use Manager for your books collection.
 
 - To modify the informations of a or several book(s), select them and click "modify", you could modify one by one books selected.
 
-- Search inputs are usefull to find easily what you want. 
+- Search inputs are usefull to find easily what you want.
 
 - In the settings menu, change the datafile location, or the number of line in the tab.
 
