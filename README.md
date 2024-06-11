@@ -2,20 +2,14 @@
 
 A easy use Manager for your books collection.
 
-## **How to Run**
+## **How to install**
 
-## **Features**
+1. Download the repository
+2. Do your changes
+3. Run with the run.bat
 
-- add books
+## **Todo**
 
-- delete books
+- put a login at the beginning
 
-- modify a book
-
-- sort list of books
-
-- search a book by its name/author/Family
-
-- settings menu
-
-- save your data in a file
+- save data on a own server cloud.
