@@ -39,6 +39,10 @@ Secure app launch.
 
 - set login at the beginning to secure a little the access.
 
-## **Issue**
+## **Issue to fix**
 
 - impossible to add books after add a family and clear it.
+
+## Contribution
+
+- @Baltemor369
