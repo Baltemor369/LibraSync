@@ -16,5 +16,5 @@ IF NOT EXIST .env (
     echo environment activate
     cd ../..
 )
-echo lauch app
+echo launch app
 python main.py
