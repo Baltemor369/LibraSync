@@ -7,7 +7,7 @@ IF NOT EXIST .env (
     echo environment activation
     call activate.bat
     cd ../..
-    echo requirements installation
+    echo requirements installation 
     pip install -r requirements.txt
 ) ELSE (
     cd .env\Scripts

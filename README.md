@@ -20,6 +20,8 @@ Secure app launch.
 
 - impossible to add books after add a family and clear it.
 
+- Google Drive API how it works
+
 ## Contribution
 
 - @Baltemor369
