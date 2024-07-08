@@ -4,7 +4,7 @@ A easy use Manager for your books collection.
 
 ## **Requirements**
 
-- **Python 3.11.1**
+- **[Python 3.11.1+](https://www.python.org/downloads/release/python-3111/)**
 
 ## **How to Run**
 
