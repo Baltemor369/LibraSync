@@ -1,64 +1,63 @@
 from src.interface import *
+from src.const import *
 
 import os.path
+import json
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-# from googleapiclient.errors import HttpError
+from googleapiclient.http import MediaFileUpload
 
 # If modifying these scopes, delete the file token.json.
-SCOPES = ["https://www.googleapis.com/auth/drive.metadata.readonly"]
+SCOPES = ["https://www.googleapis.com/auth/drive"]
+creds = None
 
-def auth():
-    """Shows basic usage of the Drive v3 API.
-    Prints the names and ids of the first 10 files the user has access to.
-    """
+def authentification():
+    global creds
     creds = None
-    # The file token.json stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-    # If there are no (valid) credentials available, let the user log in.
+    if os.path.exists(TOKEN):
+        creds = Credentials.from_authorized_user_file(TOKEN, SCOPES)
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
             try:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                "credentials.json", SCOPES
-                )
+                flow = InstalledAppFlow.from_client_secrets_file(CREDS, SCOPES)
                 creds = flow.run_local_server(port=0)
 
-                with open("token.json", "w") as token:
+                with open(TOKEN, "w") as token:
                     token.write(creds.to_json())
-                
-                load(creds)
             except Exception as error:
                 print(f"An error occurred: {error}")
 
+    return creds.valid if creds else False
+
+
 def  load(creds):
+    # build the object to interact with Google Drive API
     service = build("drive", "v3", credentials=creds)
-    results = service.files().list(q="name='data.db'").execute()
+    # get the list of files named 'data.db'
+    results = service.files().list(q=f"name={DATA_FILE}").execute()
+    print(results)
     items = results.get("files", [])
 
+    # if no file named 'data.db' is found, create it
     if not items:
-        # Le fichier "data.db" n'existe pas, créons-le
-        file_metadata = {"name": "data.db", "mimeType": "application/octet-stream"}
-        with open("data.db", "rb") as data_file:
-            media = MediaFileUpload("data.db", mimetype="application/octet-stream")
-            service.files().create(body=file_metadata, media_body=media).execute()
-        print("Le fichier 'data.db' a été créé.")
+        file_metadata = {"name": DATA_FILE}
+        media = MediaFileUpload(DATA_FILE, mimetype="application/octet-stream")
+        service.files().create(body=file_metadata, media_body=media).execute()
+        print(f"File {DATA_FILE} created.")
+    # if the file named 'data.db' is found, load its content
     else:
-        # Le fichier "data.db" existe, récupérons son contenu
         file_id = items[0]["id"]
-        request = service.files().get_media(fileId=file_id)
-        with open("data.db", "wb") as data_file:
-            data_file.write(request.execute())
-        print("Le contenu du fichier 'data.db' a été récupéré.")
+        request = service.files().get(fileId=file_id)
+        with open(DATA_FILE, "wb") as data_file:
+            data = json.dumps(request.execute())
+            data_file.write(data.encode())
 
 
 if __name__ == "__main__":
-    auth()
-    Interface()
+    if authentification():
+        load(creds)
+        # Interface()
