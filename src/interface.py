@@ -2,6 +2,7 @@ import uuid
 import tkinter as tk
 import re
 from tkinter import ttk
+from src.const import *
 from src.tkTools import clear, popup, prompt
 from src.osTools import create_path, path
 from src.library import Library,Book
@@ -15,8 +16,8 @@ class Interface():
             "bg-button":"#000000",
             
             "nbLine":10,
-            "path":"data/data.db",
-            "old_path":"data/data.db",
+            "path":DATA_FILE,
+            "old_path":DATA_FILE,
             "page":1,
         }
 
@@ -459,3 +460,4 @@ class Interface():
             self.window.quit()
         except Exception as e:
             popup(self.window, f"Error with saving data:\n{e}")
+            self.window.quit()
