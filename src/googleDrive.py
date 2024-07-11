@@ -28,9 +28,10 @@ class GoogleAuth:
 
                     with open(TOKEN, "w") as token:
                         token.write(self.creds.to_json())
-                    
+                    return True
                 except Exception as error:
-                    print(f"Error occurred in authentification : {error}")
+                    print(f"[Error101] In authentification : {error}")
+                    return False
 
         return self.creds.valid if self.creds else False
 
@@ -40,32 +41,41 @@ class GoogleAuth:
             # build the object to interact with Google Drive API
             service = build("drive", "v3", credentials=self.creds)
         except Exception as error:
-            print(f"Error occurred in building service: {error}")
+            print(f"[Error201] In building service: {error}")
+            return False
         try:
             # get the list of files named 'data.db' in the root directory of the Google Drive account
             query = f"name='{DATA_FILE}'"
             results = service.files().list(q=query, fields='files(id, name)').execute()
             items = results.get('files', [])
         except Exception as error:
-            print(f"Error occurred in listing files: {error}")
+            print(f"File '{DATA_FILE}' not found.")
         
-        try:
-            if not items:
+        if not items:
+            try:
                 print(f"File {DATA_FILE} not found. Creation...")
                 file_metadata = {"name": DATA_FILE}
                 media = MediaFileUpload(DATA_FILE, mimetype="application/octet-stream")
                 service.files().create(body=file_metadata, media_body=media).execute()
                 print(f"File {DATA_FILE} created successfully")
-                
-                # get the id of the newly created file
+            except Exception as e:
+                print(f"[Error203] Cannot create file {DATA_FILE} : {e}")
+                return False
+            try:
+                # update the request to get the ID of the file created
                 results = service.files().list(q=query, fields='files(id, name)').execute()
                 items = results.get('files', [])
-        except Exception as e:
-            print(f"A error occured in creating file: {e}")
+            except Exception as e:
+                print(f"[Error204] Cannot update the request to get files : {e}")
+                return False
         
         try:
             file_id = items[0]['id']
-            
+        except Exception as e:
+            print(f"[Error205] Cannot get file ID: {e}")
+            return False
+        
+        try:
             request = service.files().get_media(fileId=file_id)
 
             fh = io.FileIO(DATA_FILE, "wb")
@@ -76,7 +86,7 @@ class GoogleAuth:
             print(f"File {DATA_FILE} loaded successfully")
             return True
         except Exception as e:
-            print(f"A error occured in loading: {e}")
+            print(f"[Error206] In loading: {e}")
             return False
 
     def save(self):
@@ -85,14 +95,16 @@ class GoogleAuth:
             # build the object to interact with Google Drive API
             service = build("drive", "v3", credentials=self.creds)
         except Exception as e:
-            print(f"Error occurred in building service: {e}")
+            print(f"[Error301] In building service: {e}")
+            return False
         try:
             query = f"name='{DATA_FILE}'"
             results = service.files().list(q=query, fields='files(id, name)').execute()
             items = results.get('files', [])
             file_id = items[0]['id']
         except Exception as e:
-            print(f"Error occurred in getting file ID: {e}")
+            print(f"[Error302] In getting file ID: {e}")
+            return False
         try:
             # create a MediaFileUpload object
             media = MediaFileUpload(DATA_FILE, mimetype="application/octet-stream", resumable=True)
@@ -103,5 +115,7 @@ class GoogleAuth:
             while response is None:
                 status, response = request.next_chunk()
             print(f"File {DATA_FILE} saved successfully on Google Drive")
+            return True
         except Exception as e:
-            print(f"Error occurred in saving: {e}")
+            print(f"[Error302] In saving: {e}")
+            return False
