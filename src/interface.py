@@ -42,7 +42,7 @@ class Interface():
         self.data.load_from_db(self.params["path"])
 
         self.searchConditions = {}
-        self.widgets:dict[str,tk.Entry|list] = {}
+        self.widgets:dict[str,tk.Entry|list|tk.StringVar] = {}
         self.params["page"] = 1
         self.mainMenu()
 
@@ -169,9 +169,12 @@ class Interface():
 
         readLabel = tk.Label(self.bodyFrame, text="Read : ", bg=self.params["bg"], fg=self.params["fg"])
         readLabel.pack()
-        readEntry = tk.Entry(self.bodyFrame, width=30)
-        readEntry.pack(pady=10)
-        self.widgets["read"] = readEntry
+        readValue = tk.StringVar()
+        readValue.set("no")  # valeur par défaut
+        options = ["yes", "no"]
+        readOptionMenu = tk.OptionMenu(self.bodyFrame, readValue, *options)
+        readOptionMenu.pack(pady=10)
+        self.widgets["read"] = readValue
 
         tomeLabel = tk.Label(self.bodyFrame, text="Tome : ", bg=self.params["bg"], fg=self.params["fg"])
         tomeLabel.pack()
@@ -208,7 +211,7 @@ class Interface():
             "name":self.widgets["name"].get(),
             "author":self.widgets["author"].get(),
             "tome":self.widgets["tome"].get(),
-            "read":self.widgets["read"].get().lower() in ["true","yes","y"],
+            "read":self.widgets["read"].get(),
             "families": [elt.get() for elt in self.widgets["family"]]
         }
         tomes = self.tome_analyze(inputs["tome"])
@@ -300,10 +303,12 @@ class Interface():
 
         readLabel = tk.Label(self.bodyFrame, text="Read : ", bg=self.params["bg"])
         readLabel.pack()
-        readEntry = tk.Entry(self.bodyFrame, width=30)
-        readEntry.insert(0, self.item_values[5])
-        readEntry.pack(pady=10)
-        self.widgets["read"] = readEntry
+        readValue = tk.StringVar()
+        readValue.set(self.item_values[5])
+        options = ["yes", "no"]
+        readOptionMenu = tk.OptionMenu(self.bodyFrame, readValue, *options)
+        readOptionMenu.pack(pady=10)
+        self.widgets["read"] = readValue
 
         familiesFrame = tk.Frame(self.bodyFrame, bg=self.params["bg"])
         familiesFrame.pack(pady=10)
@@ -334,7 +339,7 @@ class Interface():
             book.author = author
             book.tome = tome
             book.family = families
-            book.read_status = read_status.lower() == "true"
+            book.read_status = read_status
             self.process_next_item()
     
     def refGenerator(self):
