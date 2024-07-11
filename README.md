@@ -1,8 +1,9 @@
 # **LibraSync DEV**
 
-A easy use Manager for your books collection.
-*Soon* Access everywhere with data saved on a Cloud.
-Secure app launch.
+A easy use Manager for your books collection.\
+Access on every computer cause data saved on a your Google Drive, just need to download the app.\
+Secure the app with a login.
+Export your library in .csv.
 
 ## **Requirements**
 
@@ -14,13 +15,15 @@ Secure app launch.
 
 - save data on the Google drive of the user.
 
+- Export your library in .csv.
+
 - set login at the beginning to secure a little the access.
 
 ## **Issue to fix**
 
 - impossible to add books after add a family and clear it.
 
-- Google Drive API how it works
+- need credentials.json to login to user Google drive account, but need to keep it secret and secure
 
 ## Contribution
 
