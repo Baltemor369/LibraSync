@@ -153,7 +153,7 @@ class Interface():
         self.header()
 
         self.window.geometry("500x600")
-        self.widgets["family"] = []
+        self.widgets["family"] = ""
 
         nameLabel = tk.Label(self.bodyFrame, text="Name : ", bg=self.params["bg"], fg=self.params["fg"])
         nameLabel.pack()
@@ -181,15 +181,14 @@ class Interface():
         tomeEntry = tk.Entry(self.bodyFrame, width=30)
         tomeEntry.pack(pady=10)
         self.widgets["tome"] = tomeEntry
-
-        addFamilyButton = tk.Button(self.bodyFrame, text="Add Family", command=lambda : self.addFamily(familiesFrame), bg=self.params["bg-button"], fg=self.params["fg"])
-        addFamilyButton.pack(pady=10)
-        
-        clearButton = tk.Button(self.bodyFrame, text="Clear", command=lambda : clear(familiesFrame), bg=self.params["bg-button"], fg=self.params["fg"])
-        clearButton.pack(pady=10)
         
         familiesFrame = tk.Frame(self.bodyFrame, bg=self.params["bg"])
-        familiesFrame.pack(pady=10)       
+        familiesFrame.pack(pady=10)
+
+        familiesEntry = tk.Entry(familiesFrame)
+        familiesEntry.pack(pady=10)
+        familiesEntry.insert(0, "")
+        self.widgets["family"].append(familiesEntry)     
 
         addButton = tk.Button(self.bodyFrame, text="Add", width=15, command=self.newBook, bg=self.params["bg-button"], fg=self.params["fg"])
         addButton.pack(pady=10)
@@ -197,22 +196,13 @@ class Interface():
         backButton = tk.Button(self.bodyFrame, text="Back", width=15, command=self.mainMenu, bg=self.params["bg-button"], fg=self.params["fg"])
         backButton.pack()
     
-    def addFamily(self, frame:tk.Frame|tk.Tk, value:str=""):
-        familiesLabel = tk.Label(frame, text="Families : ", bg=self.params["bg"])
-        familiesLabel.pack()
-        
-        familiesEntry = tk.Entry(frame)
-        familiesEntry.pack(pady=10)
-        familiesEntry.insert(0, value)
-        self.widgets["family"].append(familiesEntry)
-    
     def newBook(self):
         inputs = {
             "name":self.widgets["name"].get(),
             "author":self.widgets["author"].get(),
             "tome":self.widgets["tome"].get(),
             "read":self.widgets["read"].get(),
-            "families": [elt.get() for elt in self.widgets["family"]]
+            "families": self.widgets["family"].get()
         }
         tomes = self.tome_analyze(inputs["tome"])
         if tomes == []:
@@ -278,7 +268,7 @@ class Interface():
 
         self.window.geometry("500x600")
         self.widgets = {}
-        self.widgets["family"] = []
+        self.widgets["family"] = ""
 
         nameLabel = tk.Label(self.bodyFrame, text="Name : ", bg=self.params["bg"])
         nameLabel.pack()
@@ -313,8 +303,10 @@ class Interface():
         familiesFrame = tk.Frame(self.bodyFrame, bg=self.params["bg"])
         familiesFrame.pack(pady=10)
 
-        for family in self.item_values[4].split():
-            self.addFamily(familiesFrame, family)
+        familiesEntry = tk.Entry(familiesFrame)
+        familiesEntry.pack(pady=10)
+        familiesEntry.insert(0, self.item_values[4])
+        self.widgets["family"].append(familiesEntry)  
 
         addFamilyButton = tk.Button(self.bodyFrame, text="Add Family", command=lambda: self.addFamily(familiesFrame), bg=self.params["bg-button"], fg=self.params["fg"])
         addFamilyButton.pack(pady=10)
@@ -327,11 +319,11 @@ class Interface():
     
     def updateBook(self):
         ref = self.item_values[0]
-        name = self.widgets["name"].get() if self.widgets["name"]!="" and self.item_values[1] != self.widgets["name"] else self.item_values[1]
-        author = self.widgets["author"].get() if self.widgets["author"]!="" and self.item_values[2] != self.widgets["author"] else self.item_values[2]
-        tome = self.widgets["tome"].get() if self.widgets["tome"]!="" and self.item_values[3] != self.widgets["tome"] else self.item_values[3]
-        read_status = self.widgets["read"].get() if self.widgets["read"]!="" and self.item_values[4] != self.widgets["read"] else self.item_values[4]
-        families = [self.widgets["family"][i].get() for i in range(len(self.widgets["family"])) if self.widgets["family"][i].get()]
+        name = self.widgets["name"].get() if self.item_values[1] != self.widgets["name"] else self.item_values[1]
+        author = self.widgets["author"].get() if self.item_values[2] != self.widgets["author"] else self.item_values[2]
+        tome = self.widgets["tome"].get() if self.item_values[3] != self.widgets["tome"] else self.item_values[3]
+        read_status = self.widgets["read"].get() if self.item_values[4] != self.widgets["read"] else self.item_values[4]
+        families = self.widgets["family"].get() if self.item_values[5]!=self.widgets["family"].get() else self.widgets["family"].get()
 
         book = self.data.getByRef(ref)
         if book:
