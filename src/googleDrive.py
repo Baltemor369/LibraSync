@@ -1,6 +1,7 @@
 from src.const import *
 
 import os.path
+import io
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -14,6 +15,7 @@ class GoogleAuth:
         self.creds = None
         
     def authentification(self):
+        print("Authentification...")
         if os.path.exists(TOKEN):
             self.creds = Credentials.from_authorized_user_file(TOKEN, SCOPES)
         if not self.creds or not self.creds.valid:
@@ -33,15 +35,21 @@ class GoogleAuth:
         return self.creds.valid if self.creds else False
 
     def load(self):
+        print("Loading data...")
         try:
             # build the object to interact with Google Drive API
             service = build("drive", "v3", credentials=self.creds)
-
+        except Exception as error:
+            print(f"Error occurred in building service: {error}")
+        try:
             # get the list of files named 'data.db' in the root directory of the Google Drive account
             query = f"name='{DATA_FILE}'"
             results = service.files().list(q=query, fields='files(id, name)').execute()
             items = results.get('files', [])
-
+        except Exception as error:
+            print(f"Error occurred in listing files: {error}")
+        
+        try:
             if not items:
                 print(f"File {DATA_FILE} not found. Creation...")
                 file_metadata = {"name": DATA_FILE}
@@ -52,15 +60,19 @@ class GoogleAuth:
                 # get the id of the newly created file
                 results = service.files().list(q=query, fields='files(id, name)').execute()
                 items = results.get('files', [])
-                
+        except Exception as e:
+            print(f"A error occured in creating file: {e}")
+        
+        try:
             file_id = items[0]['id']
+            
             request = service.files().get_media(fileId=file_id)
 
-            with open(DATA_FILE, "wb") as data_file:
-                downloader = MediaIoBaseDownload(data_file, request)
-                done = False
-                while done is False:
-                    status, done = downloader.next_chunk()
+            fh = io.FileIO(DATA_FILE, "wb")
+            downloader = MediaIoBaseDownload(fh, request)
+            done = False
+            while done is False:
+                status, done = downloader.next_chunk()
             print(f"File {DATA_FILE} loaded successfully")
             return True
         except Exception as e:
@@ -68,6 +80,7 @@ class GoogleAuth:
             return False
 
     def save(self):
+        print("Saving data...")
         try:
             # build the object to interact with Google Drive API
             service = build("drive", "v3", credentials=self.creds)

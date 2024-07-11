@@ -6,6 +6,6 @@ if __name__ == "__main__":
     auth = GoogleAuth()
     if auth.authentification():
         print(f"Google authentification successful")
-        if auth.load:
+        if auth.load():
             Interface()
             auth.save()
