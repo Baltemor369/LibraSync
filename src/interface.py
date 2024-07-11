@@ -157,25 +157,25 @@ class Interface():
 
         nameLabel = tk.Label(self.bodyFrame, text="Name : ", bg=self.params["bg"], fg=self.params["fg"])
         nameLabel.pack()
-        nameEntry = tk.Entry(self.bodyFrame)
+        nameEntry = tk.Entry(self.bodyFrame, width=30)
         nameEntry.pack(pady=10)
         self.widgets["name"] = nameEntry
 
         authorLabel = tk.Label(self.bodyFrame, text="Author : ", bg=self.params["bg"], fg=self.params["fg"])
         authorLabel.pack()
-        authorEntry = tk.Entry(self.bodyFrame)
+        authorEntry = tk.Entry(self.bodyFrame, width=30)
         authorEntry.pack(pady=10)
         self.widgets["author"] = authorEntry
 
         readLabel = tk.Label(self.bodyFrame, text="Read : ", bg=self.params["bg"], fg=self.params["fg"])
         readLabel.pack()
-        readEntry = tk.Entry(self.bodyFrame)
+        readEntry = tk.Entry(self.bodyFrame, width=30)
         readEntry.pack(pady=10)
         self.widgets["read"] = readEntry
 
         tomeLabel = tk.Label(self.bodyFrame, text="Tome : ", bg=self.params["bg"], fg=self.params["fg"])
         tomeLabel.pack()
-        tomeEntry = tk.Entry(self.bodyFrame)
+        tomeEntry = tk.Entry(self.bodyFrame, width=30)
         tomeEntry.pack(pady=10)
         self.widgets["tome"] = tomeEntry
 
@@ -279,28 +279,28 @@ class Interface():
 
         nameLabel = tk.Label(self.bodyFrame, text="Name : ", bg=self.params["bg"])
         nameLabel.pack()
-        nameEntry = tk.Entry(self.bodyFrame)
+        nameEntry = tk.Entry(self.bodyFrame, width=30)
         nameEntry.insert(0, self.item_values[1])
         nameEntry.pack(pady=10)
         self.widgets["name"] = nameEntry
 
         authorLabel = tk.Label(self.bodyFrame, text="Author : ", bg=self.params["bg"])
         authorLabel.pack()
-        authorEntry = tk.Entry(self.bodyFrame)
+        authorEntry = tk.Entry(self.bodyFrame, width=30)
         authorEntry.insert(0, self.item_values[2])
         authorEntry.pack(pady=10)
         self.widgets["author"] = authorEntry
         
         tomeLabel = tk.Label(self.bodyFrame, text="Tome : ", bg=self.params["bg"])
         tomeLabel.pack()
-        tomeEntry = tk.Entry(self.bodyFrame)
+        tomeEntry = tk.Entry(self.bodyFrame, width=30)
         tomeEntry.insert(0, self.item_values[3])
         tomeEntry.pack(pady=10)
         self.widgets["tome"] = tomeEntry
 
         readLabel = tk.Label(self.bodyFrame, text="Read : ", bg=self.params["bg"])
         readLabel.pack()
-        readEntry = tk.Entry(self.bodyFrame)
+        readEntry = tk.Entry(self.bodyFrame, width=30)
         readEntry.insert(0, self.item_values[5])
         readEntry.pack(pady=10)
         self.widgets["read"] = readEntry
