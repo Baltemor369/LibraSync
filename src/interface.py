@@ -153,7 +153,6 @@ class Interface():
         self.header()
 
         self.window.geometry("500x600")
-        self.widgets["family"] = ""
 
         nameLabel = tk.Label(self.bodyFrame, text="Name : ", bg=self.params["bg"], fg=self.params["fg"])
         nameLabel.pack()
@@ -185,10 +184,13 @@ class Interface():
         familiesFrame = tk.Frame(self.bodyFrame, bg=self.params["bg"])
         familiesFrame.pack(pady=10)
 
+        familyLabel = tk.Label(familiesFrame, text="Family : ", bg=self.params["bg"], fg=self.params["fg"])
+        familyLabel.pack()
+
         familiesEntry = tk.Entry(familiesFrame)
         familiesEntry.pack(pady=10)
         familiesEntry.insert(0, "")
-        self.widgets["family"].append(familiesEntry)     
+        self.widgets["family"] = familiesEntry
 
         addButton = tk.Button(self.bodyFrame, text="Add", width=15, command=self.newBook, bg=self.params["bg-button"], fg=self.params["fg"])
         addButton.pack(pady=10)
@@ -268,7 +270,6 @@ class Interface():
 
         self.window.geometry("500x600")
         self.widgets = {}
-        self.widgets["family"] = ""
 
         nameLabel = tk.Label(self.bodyFrame, text="Name : ", bg=self.params["bg"])
         nameLabel.pack()
