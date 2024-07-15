@@ -13,15 +13,15 @@ Export your library in .csv.
 
 - save profil settings in a file to keep it between each session.
 
-- save data on the Google drive of the user.
+- save data on the Google drive of the user, or another cloud.
 
 - Export your library in .csv.
 
 - set login at the beginning to secure a little the access.
 
-## **Issue to fix**
+## **Need help**
 
-- need credentials.json to login to user Google drive account, but need to keep it secret and secure
+- credentials.json is necessary to login the user Google drive account, but have to keep it secret and secure (=> server ?)
 
 ## Contribution
 
