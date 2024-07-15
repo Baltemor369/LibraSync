@@ -10,11 +10,6 @@ from src.library import Library,Book
 class Interface():
     def __init__(self) -> None:
         self.params = {
-            "bg":"#232323",
-            "fg":"#EFEFEF",
-            "field-bg":"#454545",
-            "bg-button":"#000000",
-            
             "nbLine":10,
             "path":DATA_FILE,
             "old_path":DATA_FILE,
@@ -23,7 +18,7 @@ class Interface():
 
         self.window = tk.Tk()
         self.window.title("LibraSync")
-        self.window.config(bg=self.params["bg"])
+        self.window.config(bg=BG)
         icon = tk.PhotoImage(file='img/livre.png')
         self.window.iconphoto(True, icon)
         self.window.protocol("WM_DELETE_WINDOW", self.exit)
@@ -32,10 +27,10 @@ class Interface():
         # Configuration treeview style
         style = ttk.Style()
         style.configure("Custom.Treeview", 
-                        background=self.params["bg"],
-                        fieldbackground=self.params["field-bg"],
-                        foreground=self.params["fg"])
-        style.map('Custom.Treeview', background=[('selected', self.params["bg-button"])], foreground=[('selected', self.params["fg"])])
+                        background=BG,
+                        fieldbackground=FIELD_BG,
+                        foreground=FG)
+        style.map('Custom.Treeview', background=[('selected', BG_BUTTON)], foreground=[('selected', FG)])
 
         self.data = Library()
         self.data.init_db(self.params["path"])
@@ -50,22 +45,22 @@ class Interface():
     def header(self):      
         clear(self.headerFrame)
 
-        title = tk.Label(self.headerFrame, text="My Library", font=("Helvetica",34), bg=self.params["bg"], fg=self.params["fg"])
+        title = tk.Label(self.headerFrame, text="My Library", font=("Helvetica",34), bg=BG, fg=FG)
         title.pack()
 
     def mainMenu(self):
         clear(self.window)
         self.window.geometry("1000x500")
 
-        self.headerFrame = tk.Frame(self.window, bg=self.params["bg"])
+        self.headerFrame = tk.Frame(self.window, bg=BG)
         self.headerFrame.pack(fill="x", pady=20)
 
         self.header()
 
-        self.bodyFrame = tk.Frame(self.window, bg=self.params["bg"])
+        self.bodyFrame = tk.Frame(self.window, bg=BG)
         self.bodyFrame.pack()
 
-        searchingFrame = tk.Frame(self.bodyFrame, bg=self.params["bg"])
+        searchingFrame = tk.Frame(self.bodyFrame, bg=BG)
         searchingFrame.pack(pady=10)
 
         self.searchBar = tk.Entry(searchingFrame, width=40)
@@ -103,18 +98,18 @@ class Interface():
         self.searchBar4.bind("<Return>", self.searching)
         self.searchBar4.insert(0, "Read")
 
-        startSearching = tk.Button(searchingFrame, text="Search", command=self.searching, width=10, bg=self.params["bg-button"], fg=self.params["fg"])
+        startSearching = tk.Button(searchingFrame, text="Search", command=self.searching, width=10, bg=BG_BUTTON, fg=FG)
         startSearching.pack(side="left", anchor="n", padx=10)
         
-        self.treeFrame = tk.Frame(self.bodyFrame, bg=self.params["bg"])
+        self.treeFrame = tk.Frame(self.bodyFrame, bg=BG)
         self.treeFrame.pack(pady=10)
 
         self.treeview()
 
-        self.buttons1Frame = tk.Frame(self.bodyFrame, bg=self.params["bg"])
+        self.buttons1Frame = tk.Frame(self.bodyFrame, bg=BG)
         self.buttons1Frame.pack(pady=10)
         
-        self.buttons2Frame = tk.Frame(self.bodyFrame, bg=self.params["bg"])
+        self.buttons2Frame = tk.Frame(self.bodyFrame, bg=BG)
         self.buttons2Frame.pack(pady=10)
 
         self.buttonsPage()
@@ -124,27 +119,27 @@ class Interface():
         clear(self.buttons1Frame)
 
         if self.params["page"] > 1:
-            previousButton = tk.Button(self.buttons1Frame, text="Previous", width=15, command=self.previous, bg=self.params["bg-button"], fg=self.params["fg"])
+            previousButton = tk.Button(self.buttons1Frame, text="Previous", width=15, command=self.previous, bg=BG_BUTTON, fg=FG)
             previousButton.pack(side="left", anchor="n", padx=10)
 
         if len(self.data.list_books) > ((self.params["page"]-1)*self.params["nbLine"]+self.params["nbLine"]):
-            nextButton = tk.Button(self.buttons1Frame, text="Next", width=15, command=self.next, bg=self.params["bg-button"], fg=self.params["fg"])
+            nextButton = tk.Button(self.buttons1Frame, text="Next", width=15, command=self.next, bg=BG_BUTTON, fg=FG)
             nextButton.pack(side="left", anchor="n", padx=10)    
     
     def buttons(self):
-        addButton = tk.Button(self.buttons2Frame, text="Add", width=15, command=self.addNewBookMenu, bg=self.params["bg-button"], fg=self.params["fg"])
+        addButton = tk.Button(self.buttons2Frame, text="Add", width=15, command=self.addNewBookMenu, bg=BG_BUTTON, fg=FG)
         addButton.pack(side="left", anchor="n", padx=10)
 
-        modifyButton = tk.Button(self.buttons2Frame, text="Modify", width=15, command=self.modify_selected_row, bg=self.params["bg-button"], fg=self.params["fg"])
+        modifyButton = tk.Button(self.buttons2Frame, text="Modify", width=15, command=self.modify_selected_row, bg=BG_BUTTON, fg=FG)
         modifyButton.pack(side="left", anchor="n", padx=10)
 
-        delButton = tk.Button(self.buttons2Frame, text="Delete", width=15, command=self.deleteBook, bg=self.params["bg-button"], fg=self.params["fg"])
+        delButton = tk.Button(self.buttons2Frame, text="Delete", width=15, command=self.deleteBook, bg=BG_BUTTON, fg=FG)
         delButton.pack(side="left", anchor="n", padx=10)
 
-        settingsButton = tk.Button(self.buttons2Frame, text="Settings", width=15, command=self.settingsMenu, bg=self.params["bg-button"], fg=self.params["fg"])
+        settingsButton = tk.Button(self.buttons2Frame, text="Settings", width=15, command=self.settingsMenu, bg=BG_BUTTON, fg=FG)
         settingsButton.pack(side="left", anchor="n", padx=10)
 
-        exitButton = tk.Button(self.buttons2Frame, text="Quit", width=15, command=self.exit, bg=self.params["bg-button"], fg=self.params["fg"])
+        exitButton = tk.Button(self.buttons2Frame, text="Quit", width=15, command=self.exit, bg=BG_BUTTON, fg=FG)
         exitButton.pack(side="left", anchor="n", padx=10)
 
     def addNewBookMenu(self):
@@ -154,19 +149,19 @@ class Interface():
 
         self.window.geometry("500x600")
 
-        nameLabel = tk.Label(self.bodyFrame, text="Name : ", bg=self.params["bg"], fg=self.params["fg"])
+        nameLabel = tk.Label(self.bodyFrame, text="Name : ", bg=BG, fg=FG)
         nameLabel.pack()
         nameEntry = tk.Entry(self.bodyFrame, width=30)
         nameEntry.pack(pady=10)
         self.widgets["name"] = nameEntry
 
-        authorLabel = tk.Label(self.bodyFrame, text="Author : ", bg=self.params["bg"], fg=self.params["fg"])
+        authorLabel = tk.Label(self.bodyFrame, text="Author : ", bg=BG, fg=FG)
         authorLabel.pack()
         authorEntry = tk.Entry(self.bodyFrame, width=30)
         authorEntry.pack(pady=10)
         self.widgets["author"] = authorEntry
 
-        readLabel = tk.Label(self.bodyFrame, text="Read : ", bg=self.params["bg"], fg=self.params["fg"])
+        readLabel = tk.Label(self.bodyFrame, text="Read : ", bg=BG, fg=FG)
         readLabel.pack()
         readValue = tk.StringVar()
         readValue.set("no")  # valeur par défaut
@@ -175,28 +170,41 @@ class Interface():
         readOptionMenu.pack(pady=10)
         self.widgets["read"] = readValue
 
-        tomeLabel = tk.Label(self.bodyFrame, text="Tome : ", bg=self.params["bg"], fg=self.params["fg"])
+        tomeLabel = tk.Label(self.bodyFrame, text="Tome : ", bg=BG, fg=FG)
         tomeLabel.pack()
         tomeEntry = tk.Entry(self.bodyFrame, width=30)
         tomeEntry.pack(pady=10)
         self.widgets["tome"] = tomeEntry
         
-        familiesFrame = tk.Frame(self.bodyFrame, bg=self.params["bg"])
+        familiesFrame = tk.Frame(self.bodyFrame, bg=BG)
         familiesFrame.pack(pady=10)
+        
+        addFamilyButton = tk.Button(familiesFrame, text="Add Family", command=lambda : self.addFamilyInput(familiesFrame))
+        addFamilyButton.pack()
 
-        familyLabel = tk.Label(familiesFrame, text="Family : ", bg=self.params["bg"], fg=self.params["fg"])
+        # familyLabel = tk.Label(familiesFrame, text="Family : ", bg=BG, fg=FG)
+        # familyLabel.pack()
+
+        # familiesEntry = tk.Entry(familiesFrame)
+        # familiesEntry.pack(pady=10)
+        # familiesEntry.insert(0, "")
+        # self.widgets["family"] = familiesEntry
+
+        addButton = tk.Button(self.bodyFrame, text="Add", width=15, command=self.newBook, bg=BG_BUTTON, fg=FG)
+        addButton.pack(pady=10)
+
+        backButton = tk.Button(self.bodyFrame, text="Back", width=15, command=self.mainMenu, bg=BG_BUTTON, fg=FG)
+        backButton.pack()
+
+    def addFamilyInput(self, frame:tk.Frame):
+        familyLabel = tk.Label(frame, text="Family : ", bg=BG, fg=FG)
         familyLabel.pack()
 
-        familiesEntry = tk.Entry(familiesFrame)
+        familiesEntry = tk.Entry(frame)
         familiesEntry.pack(pady=10)
         familiesEntry.insert(0, "")
         self.widgets["family"] = familiesEntry
 
-        addButton = tk.Button(self.bodyFrame, text="Add", width=15, command=self.newBook, bg=self.params["bg-button"], fg=self.params["fg"])
-        addButton.pack(pady=10)
-
-        backButton = tk.Button(self.bodyFrame, text="Back", width=15, command=self.mainMenu, bg=self.params["bg-button"], fg=self.params["fg"])
-        backButton.pack()
     
     def newBook(self):
         inputs = {
@@ -271,28 +279,28 @@ class Interface():
         self.window.geometry("500x600")
         self.widgets = {}
 
-        nameLabel = tk.Label(self.bodyFrame, text="Name : ", bg=self.params["bg"])
+        nameLabel = tk.Label(self.bodyFrame, text="Name : ", bg=BG)
         nameLabel.pack()
         nameEntry = tk.Entry(self.bodyFrame, width=30)
         nameEntry.insert(0, self.item_values[1])
         nameEntry.pack(pady=10)
         self.widgets["name"] = nameEntry
 
-        authorLabel = tk.Label(self.bodyFrame, text="Author : ", bg=self.params["bg"])
+        authorLabel = tk.Label(self.bodyFrame, text="Author : ", bg=BG)
         authorLabel.pack()
         authorEntry = tk.Entry(self.bodyFrame, width=30)
         authorEntry.insert(0, self.item_values[2])
         authorEntry.pack(pady=10)
         self.widgets["author"] = authorEntry
         
-        tomeLabel = tk.Label(self.bodyFrame, text="Tome : ", bg=self.params["bg"])
+        tomeLabel = tk.Label(self.bodyFrame, text="Tome : ", bg=BG)
         tomeLabel.pack()
         tomeEntry = tk.Entry(self.bodyFrame, width=30)
         tomeEntry.insert(0, self.item_values[3])
         tomeEntry.pack(pady=10)
         self.widgets["tome"] = tomeEntry
 
-        readLabel = tk.Label(self.bodyFrame, text="Read : ", bg=self.params["bg"])
+        readLabel = tk.Label(self.bodyFrame, text="Read : ", bg=BG)
         readLabel.pack()
         readValue = tk.StringVar()
         readValue.set(self.item_values[5])
@@ -301,7 +309,7 @@ class Interface():
         readOptionMenu.pack(pady=10)
         self.widgets["read"] = readValue
 
-        familiesFrame = tk.Frame(self.bodyFrame, bg=self.params["bg"])
+        familiesFrame = tk.Frame(self.bodyFrame, bg=BG)
         familiesFrame.pack(pady=10)
 
         familiesEntry = tk.Entry(familiesFrame)
@@ -309,13 +317,13 @@ class Interface():
         familiesEntry.insert(0, self.item_values[4])
         self.widgets["family"].append(familiesEntry)  
 
-        addFamilyButton = tk.Button(self.bodyFrame, text="Add Family", command=lambda: self.addFamily(familiesFrame), bg=self.params["bg-button"], fg=self.params["fg"])
+        addFamilyButton = tk.Button(self.bodyFrame, text="Add Family", command=lambda: self.addFamily(familiesFrame), bg=BG_BUTTON, fg=FG)
         addFamilyButton.pack(pady=10)
 
-        addButton = tk.Button(self.bodyFrame, text="Save", width=15, command=self.updateBook, bg=self.params["bg-button"], fg=self.params["fg"])
+        addButton = tk.Button(self.bodyFrame, text="Save", width=15, command=self.updateBook, bg=BG_BUTTON, fg=FG)
         addButton.pack(pady=10)
 
-        backButton = tk.Button(self.bodyFrame, text="Back", width=15, command=self.mainMenu, bg=self.params["bg-button"], fg=self.params["fg"])
+        backButton = tk.Button(self.bodyFrame, text="Back", width=15, command=self.mainMenu, bg=BG_BUTTON, fg=FG)
         backButton.pack()
     
     def updateBook(self):
@@ -415,7 +423,7 @@ class Interface():
     def settingsMenu(self):
         clear(self.bodyFrame)
 
-        label = tk.Label(self.bodyFrame, text="Nb Line Display", bg=self.params["bg"], fg=self.params["fg"])
+        label = tk.Label(self.bodyFrame, text="Nb Line Display", bg=BG, fg=FG)
         label.pack()
 
         nbEntry = tk.Entry(self.bodyFrame)
@@ -423,7 +431,7 @@ class Interface():
         nbEntry.pack()
         self.widgets["nbLine"] = nbEntry
         
-        pathLabel = tk.Label(self.bodyFrame, text="Saved File Path", bg=self.params["bg"], fg=self.params["fg"])
+        pathLabel = tk.Label(self.bodyFrame, text="Saved File Path", bg=BG, fg=FG)
         pathLabel.pack()
 
         pathEntry = tk.Entry(self.bodyFrame)
@@ -431,10 +439,10 @@ class Interface():
         pathEntry.pack()
         self.widgets["path"] = pathEntry
 
-        saveButton = tk.Button(self.bodyFrame, text="Save", width=15, command=self.mainMenu, bg=self.params["bg-button"], fg=self.params["fg"])
+        saveButton = tk.Button(self.bodyFrame, text="Save", width=15, command=self.mainMenu, bg=BG_BUTTON, fg=FG)
         saveButton.pack(pady=10)
 
-        backButton = tk.Button(self.bodyFrame, text="Back", width=15, command=self.mainMenu, bg=self.params["bg-button"], fg=self.params["fg"])
+        backButton = tk.Button(self.bodyFrame, text="Back", width=15, command=self.mainMenu, bg=BG_BUTTON, fg=FG)
         backButton.pack(pady=10)
     
     def saveSettings(self):
