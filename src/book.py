@@ -1,5 +1,5 @@
 class Book:
-    def __init__(self, ref:str, name:str="", author:str="", tome:int=-1, read_status:str="no", family:str="") -> None:
+    def __init__(self, ref:str, name:str="", author:str="", tome:int=-1, family:str="", read_status:str="no") -> None:
         self.ref = ref
         self.name = name
         self.author = author
@@ -7,5 +7,5 @@ class Book:
         self.read_status = bool(read_status)
         self.family = family
 
-    def info(self):
+    def __str__(self):
         return self.ref + " " + self.name + " " + self.author + " " + str(self.tome) + " " + self.family

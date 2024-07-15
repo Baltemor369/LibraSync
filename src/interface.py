@@ -13,9 +13,9 @@ class Interface():
             "nbLine":10,
             "path":DATA_FILE,
             "old_path":DATA_FILE,
-            "page":1,
+            "page":1,   
         }
-
+        
         self.window = tk.Tk()
         self.window.title("LibraSync")
         self.window.config(bg=BG)
@@ -178,32 +178,20 @@ class Interface():
         
         familiesFrame = tk.Frame(self.bodyFrame, bg=BG)
         familiesFrame.pack(pady=10)
-        
-        addFamilyButton = tk.Button(familiesFrame, text="Add Family", command=lambda : self.addFamilyInput(familiesFrame))
-        addFamilyButton.pack()
 
-        # familyLabel = tk.Label(familiesFrame, text="Family : ", bg=BG, fg=FG)
-        # familyLabel.pack()
+        familyLabel = tk.Label(familiesFrame, text="Family : ", bg=BG, fg=FG)
+        familyLabel.pack(side=tk.LEFT)
 
-        # familiesEntry = tk.Entry(familiesFrame)
-        # familiesEntry.pack(pady=10)
-        # familiesEntry.insert(0, "")
-        # self.widgets["family"] = familiesEntry
+        familiesEntry = tk.Entry(familiesFrame)
+        familiesEntry.pack(side=tk.LEFT, padx=5)
+        familiesEntry.insert(0, "")
+        self.widgets["family"] = familiesEntry
 
         addButton = tk.Button(self.bodyFrame, text="Add", width=15, command=self.newBook, bg=BG_BUTTON, fg=FG)
         addButton.pack(pady=10)
 
         backButton = tk.Button(self.bodyFrame, text="Back", width=15, command=self.mainMenu, bg=BG_BUTTON, fg=FG)
         backButton.pack()
-
-    def addFamilyInput(self, frame:tk.Frame):
-        familyLabel = tk.Label(frame, text="Family : ", bg=BG, fg=FG)
-        familyLabel.pack()
-
-        familiesEntry = tk.Entry(frame)
-        familiesEntry.pack(pady=10)
-        familiesEntry.insert(0, "")
-        self.widgets["family"] = familiesEntry
 
     
     def newBook(self):
@@ -219,7 +207,7 @@ class Interface():
             popup(self.window, "Invalid Tome inputs.", "Error")
         else:
             for i in tomes:
-                self.data.addBook(Book(self.refGenerator(), inputs["name"], inputs["author"], i, inputs["read"], inputs["families"]))
+                self.data.addBook(Book(self.refGenerator(), inputs["name"], inputs["author"], i, inputs["families"], inputs["read"]))
             self.mainMenu()
     
     def tome_analyze(self, text:str):
@@ -259,51 +247,51 @@ class Interface():
         self.buttonsPage()
 
     def modify_selected_row(self):
-        self.old_values = []
+        books = []
         selected_items = list(self.tree.selection())
+        
         for elt in selected_items:
-            self.old_values.append(self.tree.item(elt, "values"))
+            values = list(self.tree.item(elt, "values"))
+            books.append(Book(*values))
 
-        self.process_next_item()
+        self.process_next_item(books)
 
-    def process_next_item(self):
-        if self.old_values:
-            self.item_values = self.old_values.pop(0)
-            self.modify_book_menu()
+    def process_next_item(self, list_books:list):
+        if len(list_books)>0:
+            self.modify_book_menu(list_books, list_books.pop(0))
         else:
             self.mainMenu()
 
-    def modify_book_menu(self):
+    def modify_book_menu(self, books, book:Book):
         clear(self.bodyFrame)
 
         self.window.geometry("500x600")
-        self.widgets = {}
 
         nameLabel = tk.Label(self.bodyFrame, text="Name : ", bg=BG)
         nameLabel.pack()
         nameEntry = tk.Entry(self.bodyFrame, width=30)
-        nameEntry.insert(0, self.item_values[1])
+        nameEntry.insert(0, book.name)
         nameEntry.pack(pady=10)
         self.widgets["name"] = nameEntry
 
         authorLabel = tk.Label(self.bodyFrame, text="Author : ", bg=BG)
         authorLabel.pack()
         authorEntry = tk.Entry(self.bodyFrame, width=30)
-        authorEntry.insert(0, self.item_values[2])
+        authorEntry.insert(0, book.author)
         authorEntry.pack(pady=10)
         self.widgets["author"] = authorEntry
         
         tomeLabel = tk.Label(self.bodyFrame, text="Tome : ", bg=BG)
         tomeLabel.pack()
         tomeEntry = tk.Entry(self.bodyFrame, width=30)
-        tomeEntry.insert(0, self.item_values[3])
+        tomeEntry.insert(0, book.tome)
         tomeEntry.pack(pady=10)
         self.widgets["tome"] = tomeEntry
 
         readLabel = tk.Label(self.bodyFrame, text="Read : ", bg=BG)
         readLabel.pack()
         readValue = tk.StringVar()
-        readValue.set(self.item_values[5])
+        readValue.set(book.read_status)
         options = ["yes", "no"]
         readOptionMenu = tk.OptionMenu(self.bodyFrame, readValue, *options)
         readOptionMenu.pack(pady=10)
@@ -312,27 +300,48 @@ class Interface():
         familiesFrame = tk.Frame(self.bodyFrame, bg=BG)
         familiesFrame.pack(pady=10)
 
+        familyLabel = tk.Label(familiesFrame, text="Family : ", bg=BG, fg=FG)
+        familyLabel.pack(side=tk.LEFT)
+
         familiesEntry = tk.Entry(familiesFrame)
-        familiesEntry.pack(pady=10)
-        familiesEntry.insert(0, self.item_values[4])
-        self.widgets["family"].append(familiesEntry)  
+        familiesEntry.pack(side=tk.LEFT, padx=5)
+        familiesEntry.insert(0, book.family)
+        self.widgets["family"] = familiesEntry
 
-        addFamilyButton = tk.Button(self.bodyFrame, text="Add Family", command=lambda: self.addFamily(familiesFrame), bg=BG_BUTTON, fg=FG)
-        addFamilyButton.pack(pady=10)
-
-        addButton = tk.Button(self.bodyFrame, text="Save", width=15, command=self.updateBook, bg=BG_BUTTON, fg=FG)
+        addButton = tk.Button(self.bodyFrame, text="Save", width=15, command=lambda : self.updateBook(books, book), bg=BG_BUTTON, fg=FG)
         addButton.pack(pady=10)
 
         backButton = tk.Button(self.bodyFrame, text="Back", width=15, command=self.mainMenu, bg=BG_BUTTON, fg=FG)
         backButton.pack()
     
-    def updateBook(self):
-        ref = self.item_values[0]
-        name = self.widgets["name"].get() if self.item_values[1] != self.widgets["name"] else self.item_values[1]
-        author = self.widgets["author"].get() if self.item_values[2] != self.widgets["author"] else self.item_values[2]
-        tome = self.widgets["tome"].get() if self.item_values[3] != self.widgets["tome"] else self.item_values[3]
-        read_status = self.widgets["read"].get() if self.item_values[4] != self.widgets["read"] else self.item_values[4]
-        families = self.widgets["family"].get() if self.item_values[5]!=self.widgets["family"].get() else self.widgets["family"].get()
+    def editFamilyInput(self, frame: tk.Frame, familyName, book:Book):
+        familyFrame = tk.Frame(frame, bg=BG)
+        familyFrame.pack(pady=10)
+
+        familyLabel = tk.Label(familyFrame, text="Family : ", bg=BG, fg=FG)
+        familyLabel.pack(side=tk.LEFT)
+
+        familiesEntry = tk.Entry(familyFrame)
+        familiesEntry.pack(side=tk.LEFT, padx=5)
+        familiesEntry.insert(0, familyName)
+        
+        self.widgets["family"].append(familiesEntry)
+
+        def deleteFamily():
+            familyFrame.destroy()
+            self.widgets["family"].remove(familiesEntry)
+            book.removeFamily(familyName)
+
+        deleteButton = tk.Button(familyFrame, text="Delete", command=deleteFamily, bg=BG_BUTTON, fg=FG)
+        deleteButton.pack(side=tk.LEFT, padx=5)
+    
+    def updateBook(self, books, book:Book):
+        ref = book.ref
+        name = self.widgets["name"].get() if book.name != self.widgets["name"] else book.name
+        author = self.widgets["author"].get() if book.author != self.widgets["author"] else book.author
+        tome = self.widgets["tome"].get() if book.tome != self.widgets["tome"] else book.tome
+        read_status = self.widgets["read"].get() if book.read_status != self.widgets["read"] else book.read_status
+        families = self.widgets["family"].get()
 
         book = self.data.getByRef(ref)
         if book:
@@ -341,7 +350,7 @@ class Interface():
             book.tome = tome
             book.family = families
             book.read_status = read_status
-            self.process_next_item()
+            self.process_next_item(books)
     
     def refGenerator(self):
         return str(uuid.uuid4())
