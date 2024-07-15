@@ -21,8 +21,6 @@ Export your library in .csv.
 
 ## **Issue to fix**
 
-- impossible to add books after add a family and clear it.
-
 - need credentials.json to login to user Google drive account, but need to keep it secret and secure
 
 ## Contribution
