@@ -3,16 +3,13 @@ import tkinter as tk
 import re
 from tkinter import ttk
 from src.const import *
-from src.tkTools import clear, popup, prompt
-from src.osTools import create_path, path
+from src.tkTools import clear, popup
 from src.library import Library,Book
 
 class Interface():
     def __init__(self) -> None:
         self.params = {
             "nbLine":10,
-            "path":DATA_FILE,
-            "old_path":DATA_FILE,
             "page":1,   
         }
         
@@ -33,8 +30,8 @@ class Interface():
         style.map('Custom.Treeview', background=[('selected', BG_BUTTON)], foreground=[('selected', FG)])
 
         self.data = Library()
-        self.data.init_db(self.params["path"])
-        self.data.load_from_db(self.params["path"])
+        self.data.init_db(DATA_FILE)
+        self.data.load_from_db(DATA_FILE)
 
         self.searchConditions = {}
         self.widgets:dict[str,tk.Entry|list|tk.StringVar] = {}
@@ -398,7 +395,8 @@ class Interface():
             self.tree.heading(col, text=col, command=lambda c=col: self.sort_column(self.tree, c, False))
             self.tree.column(col, anchor="center")
         
-        ls = self.data.select(((self.params["page"]-1)*self.params["nbLine"]), self.params["nbLine"], where=self.searchConditions) 
+        ls = self.data.select(((self.params["page"]-1)*self.params["nbLine"]), self.params["nbLine"], where=self.searchConditions)
+        print(len(ls)," # ",self.params["nbLine"])
         if len(ls)==0:
             self.params["page"] -= 1 if self.params["page"] > 0 else 0
             ls = self.data.select(((self.params["page"]-1)*self.params["nbLine"]), self.params["nbLine"], where=self.searchConditions)
@@ -432,7 +430,7 @@ class Interface():
     def settingsMenu(self):
         clear(self.bodyFrame)
 
-        label = tk.Label(self.bodyFrame, text="Nb Line Display", bg=BG, fg=FG)
+        label = tk.Label(self.bodyFrame, text="Books per page", bg=BG, fg=FG)
         label.pack()
 
         nbEntry = tk.Entry(self.bodyFrame)
@@ -440,38 +438,27 @@ class Interface():
         nbEntry.pack()
         self.widgets["nbLine"] = nbEntry
         
-        pathLabel = tk.Label(self.bodyFrame, text="Saved File Path", bg=BG, fg=FG)
-        pathLabel.pack()
-
-        pathEntry = tk.Entry(self.bodyFrame)
-        pathEntry.insert(0, self.params["path"])
-        pathEntry.pack()
-        self.widgets["path"] = pathEntry
-
-        saveButton = tk.Button(self.bodyFrame, text="Save", width=15, command=self.mainMenu, bg=BG_BUTTON, fg=FG)
+        saveButton = tk.Button(self.bodyFrame, text="Save", width=15, command=self.saveSettings, bg=BG_BUTTON, fg=FG)
         saveButton.pack(pady=10)
 
         backButton = tk.Button(self.bodyFrame, text="Back", width=15, command=self.mainMenu, bg=BG_BUTTON, fg=FG)
         backButton.pack(pady=10)
     
     def saveSettings(self):
-        nb_line = self.widgets["nbLine"].get()
-        new_path = self.widgets["path"].get()
-
-        if path.exists(new_path):
-            self.params["old_path"] = self.params["path"]
-            self.params["path"] = new_path
-        else:
-            response = prompt("Create path", f"the path {new_path} doesn't exist,\nDo you want to create it ?")
-            if response:
-                create_path(new_path)
-
-        if 10 < nb_line < 50 :   
+        try:
+            nb_line = (int)(self.widgets["nbLine"].get())
+        except ValueError:
+            popup(self.window, "Invalid input. Please enter a number between 5 and 50.")
+            return
+        
+        if 5 <= nb_line <= 50 :   
             self.params["nbLine"] = nb_line 
+        
+        self.mainMenu()
 
     def exit(self):
         try:
-            self.data.save_to_db(self.params["path"])
+            self.data.save_to_db(DATA_FILE)
             self.window.quit()
         except Exception as e:
             print(e)
