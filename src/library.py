@@ -60,14 +60,14 @@ class Library:
                 cursor.execute('''
                     INSERT INTO books (ref, name, author, tome, read_status, family)
                     VALUES (?, ?, ?, ?, ?, ?)
-                ''', (book.ref, book.name, book.author, book.tome, book.read_status, ','.join(book.family)))
+                ''', (book.ref, book.name, book.author, book.tome, book.read_status, book.family))
             else:
-                if (row[1], row[2], row[3], row[4], row[5]) != (book.name, book.author, book.tome, book.read_status, ','.join(book.family)):
+                if (row[1], row[2], row[3], row[4], row[5]) != (book.name, book.author, book.tome, book.read_status, book.family):
                     cursor.execute('''
                         UPDATE books
                         SET name = ?, author = ?, tome = ?, read_status = ?, family = ?
                         WHERE ref = ?
-                    ''', (book.name, book.author, book.tome, book.read_status, ','.join(book.family), book.ref))
+                    ''', (book.name, book.author, book.tome, book.read_status, book.family, book.ref))
         conn.commit()
         conn.close()
 
@@ -79,8 +79,7 @@ class Library:
         self.list_books = []
         for row in rows:
             ref, name, author, tome, read_status, family = row
-            families = family.split(',') if family else []
-            book = Book(ref, name, author, tome, read_status, families)
+            book = Book(ref, name, author, tome, read_status, family)
             self.list_books.append(book)
         conn.close()
     

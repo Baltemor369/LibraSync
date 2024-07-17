@@ -474,5 +474,6 @@ class Interface():
             self.data.save_to_db(self.params["path"])
             self.window.quit()
         except Exception as e:
+            print(e)
             popup(self.window, f"Error with saving data:\n{e}")
             self.window.quit()
